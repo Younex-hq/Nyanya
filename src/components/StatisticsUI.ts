@@ -16,17 +16,31 @@ export class StatisticsUI {
     private initialize() {
         this.container.innerHTML = `
             <div class="stats-dashboard">
-                <div class="stats-grid">
+                <!-- 1. Today Stats -->
+                <div class="stats-group-container">
                     <div class="stat-card minimal-card">
-                        <h3>Today</h3>
-                        <div class="stat-row"><span>Focus</span> <strong id="stat-today-focus">00:00</strong></div>
-                        <div class="stat-row"><span>Break</span> <strong id="stat-today-break">00:00</strong></div>
-                        <div class="stat-row"><span>Ints</span> <strong id="stat-today-int">00:00</strong></div>
+                        <h3>Today's Overview</h3>
+                        <div class="stat-horizontal-row">
+                            <div class="stat-box"><span>Focus</span> <strong id="stat-today-focus">00:00</strong></div>
+                            <div class="stat-box"><span>Break</span> <strong id="stat-today-break">00:00</strong></div>
+                            <div class="stat-box"><span>Interruptions</span> <strong id="stat-today-int">00:00</strong></div>
+                        </div>
                     </div>
                     
+                    <div class="stat-card heatmap-container">
+                        <h3>Productive Hours (Today)</h3>
+                        <div id="heatmap-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <div class="heatmap-grid daily-heatmap" id="heatmap-hours"></div>
+                            <div class="heatmap-labels daily-labels" id="heatmap-labels"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Historical Analysis (Unified Range) -->
+                <div class="stats-group-container">
                     <div class="stat-card minimal-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h3>Selected Range</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3>Range Analysis</h3>
                             <select id="stat-range-select" class="input-field" style="width: auto; padding: 0.25rem; margin: 0; font-size: 0.8rem;">
                                 <option value="today">Today</option>
                                 <option value="week">Week</option>
@@ -34,48 +48,35 @@ export class StatisticsUI {
                                 <option value="total" selected>Total</option>
                             </select>
                         </div>
-                        <div class="stat-row"><span>Focus</span> <strong id="stat-range-focus">00:00</strong></div>
-                        <div class="stat-row" style="visibility: hidden;"><span>Placeholder</span> <strong>00:00</strong></div>
+                        <div class="stat-horizontal-row">
+                            <div class="stat-box"><span>Focus</span> <strong id="stat-range-focus">00:00</strong></div>
+                            <div class="stat-box"><span>Break</span> <strong id="stat-range-break">00:00</strong></div>
+                            <div class="stat-box"><span>Interruptions</span> <strong id="stat-range-int">00:00</strong></div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="stats-grid">
+                        <div class="stat-card">
                             <h3>Distribution</h3>
-                            <select id="stat-distribution-range-select" class="input-field" style="width: auto; padding: 0.25rem; margin: 0; font-size: 0.8rem;">
-                                <option value="today">Today</option>
-                                <option value="week">Week</option>
-                                <option value="month">Month</option>
-                                <option value="total" selected>Total</option>
-                            </select>
+                            <div style="max-width: 300px; width: 100%; margin: 0 auto;">
+                                <canvas id="chart-ring"></canvas>
+                            </div>
                         </div>
-                        <div style="max-width: 320px; width: 100%; margin: 0 auto;">
-                            <canvas id="chart-ring"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <h3>Focus vs Interruptions</h3>
-                        <div style="width: 100%; height: 260px;">
-                            <canvas id="chart-line"></canvas>
+                        <div class="stat-card">
+                            <h3>Focus vs Interruptions</h3>
+                            <div style="width: 100%; height: 260px;">
+                                <canvas id="chart-line"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="stat-card heatmap-container">
-                    <h3>Productive Hours (Today)</h3>
-                    <div id="heatmap-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
-                        <div class="heatmap-grid daily-heatmap" id="heatmap-hours">
-                            <!-- 24 cells for hours -->
-                        </div>
-                        <div class="heatmap-labels daily-labels" id="heatmap-labels">
-                            <!-- labels -->
-                        </div>
-                    </div>
+                <div class="stat-card">
+                    <h3 style="margin-bottom: 1rem;">Timeline</h3>
+                    <div id="timeline-list" class="timeline-list"></div>
                 </div>
 
-                <div class="stat-card heatmap-container">
+                <div class="stat-card heatmap-container" style="margin-top: 1rem;">
                     <h3>Yearly Focus Activity</h3>
                     <div class="heatmap-wrapper" style="overflow-x: auto; display: flex; gap: 0.5rem; padding: 0.5rem 0;">
                         <div class="heatmap-day-labels" style="display: grid; grid-template-rows: repeat(7, 12px); gap: 3px; font-size: 0.65rem; opacity: 0.6; padding-top: 1.25rem;">
@@ -88,24 +89,14 @@ export class StatisticsUI {
                             <div></div> <!-- Sat -->
                         </div>
                         <div style="flex: 1;">
-                            <div id="heatmap-month-labels" style="display: grid; grid-auto-columns: 12px; grid-auto-flow: column; gap: 3px; font-size: 0.65rem; opacity: 0.6; height: 1.25rem; align-items: end;">
-                                <!-- months -->
-                            </div>
-                            <div class="yearly-heatmap-grid" id="heatmap-yearly" style="padding: 0;">
-                                <!-- 7x53 cells -->
-                            </div>
+                            <div id="heatmap-month-labels" style="display: grid; grid-auto-columns: 12px; grid-auto-flow: column; gap: 3px; font-size: 0.65rem; opacity: 0.6; height: 1.25rem; align-items: end;"></div>
+                            <div class="yearly-heatmap-grid" id="heatmap-yearly" style="padding: 0;"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="stat-card">
-                    <h3 style="margin-bottom: 1rem;">Timeline</h3>
-                    <div id="timeline-list" class="timeline-list">
-                        <!-- timeline items -->
-                    </div>
-                </div>
-
-                <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 1rem;">
+                <!-- 3. Actions Button Row Footer -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 2rem 0 1rem; border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 1rem;">
                     <button class="btn-secondary" id="btn-clear-data-bottom" style="padding: 0.5rem 1.5rem; font-size: 0.9rem; border-color: rgba(242, 184, 181, 0.4); color: #f2b8b5;">Clear All Data</button>
                     <button class="btn-secondary" id="btn-export-json-bottom" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Export JSON</button>
                     <button class="btn-secondary" id="btn-import-json-bottom" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Import JSON</button>
@@ -153,10 +144,6 @@ export class StatisticsUI {
         document.getElementById('stat-range-select')!.addEventListener('change', () => {
             this.render();
         });
-
-        document.getElementById('stat-distribution-range-select')!.addEventListener('change', () => {
-            this.render();
-        });
     }
 
     public async render() {
@@ -173,18 +160,17 @@ export class StatisticsUI {
         const rangeStr = (document.getElementById('stat-range-select') as HTMLSelectElement).value as any;
         const rangeSessions = StatisticsHelpers.filterByRange(sessions, rangeStr);
         document.getElementById('stat-range-focus')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getFocusTimeMin(rangeSessions));
+        document.getElementById('stat-range-break')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getBreakTimeMin(rangeSessions));
+        document.getElementById('stat-range-int')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getInterruptionsMin(rangeSessions));
 
-        const distRangeStr = (document.getElementById('stat-distribution-range-select') as HTMLSelectElement).value as any;
-        const distSessions = StatisticsHelpers.filterByRange(sessions, distRangeStr);
-
-        this.renderGraphs(rangeSessions, distSessions, tagMap);
+        this.renderGraphs(rangeSessions, tagMap);
         this.renderProductiveHours(sessions, tagMap);
-        this.renderYearlyHeatmap(sessions);
         this.renderTimeline(rangeSessions.filter(s => !s.is_break), tagMap);
+        this.renderYearlyHeatmap(sessions);
     }
 
-    private renderGraphs(compareSessions: Session[], distributionSessions: Session[], tagMap: Map<string, Tag>) {
-        const focusSessions = distributionSessions.filter(s => !s.is_break);
+    private renderGraphs(rangeSessions: Session[], tagMap: Map<string, Tag>) {
+        const focusSessions = rangeSessions.filter(s => !s.is_break);
         
         // Ring Graph
         const groupedByTag: Record<string, number> = {};
@@ -219,14 +205,13 @@ export class StatisticsUI {
             }
         });
 
-        // Line Graph
+        // Bar Graph
         const lineCtx = document.getElementById('chart-line') as HTMLCanvasElement;
         if(this.lineChartInstance) this.lineChartInstance.destroy();
         
-        // aggregate by day for line graph
-        const daysRaw = [...new Set(compareSessions.map(s => s.end.split('T')[0]))].sort();
-        const focusData = daysRaw.map(d => compareSessions.filter(s => s.end.startsWith(d) && !s.is_break).reduce((a,b)=>a+b.duration, 0));
-        const intData = daysRaw.map(d => compareSessions.filter(s => s.end.startsWith(d)).reduce((a,b)=>a+b.interruptions, 0));
+        const daysRaw = [...new Set(rangeSessions.map(s => s.end.split('T')[0]))].sort();
+        const focusData = daysRaw.map(d => rangeSessions.filter(s => s.end.startsWith(d) && !s.is_break).reduce((a,b)=>a+b.duration, 0));
+        const intData = daysRaw.map(d => rangeSessions.filter(s => s.end.startsWith(d)).reduce((a,b)=>a+b.interruptions, 0));
 
         this.lineChartInstance = new Chart(lineCtx, {
             type: 'bar',

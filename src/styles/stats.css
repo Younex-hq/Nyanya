@@ -4,9 +4,25 @@
   gap: 2rem;
 }
 
+.stat-row-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stats-group-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--shape-extra-large);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
 }
 
@@ -21,27 +37,39 @@
 
 .stat-card h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--sys-color-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.minimal-card {
-  padding: 1.25rem;
-}
-
-.stat-row {
+.stat-horizontal-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1rem;
-  border-bottom: 1px solid var(--sys-color-outline);
-  padding-bottom: 0.5rem;
+  justify-content: space-around;
+  gap: 1rem;
+  text-align: center;
 }
 
-.stat-row:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.stat-box span {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-box strong {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--sys-color-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .heatmap-container {
