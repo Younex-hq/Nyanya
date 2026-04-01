@@ -16,13 +16,6 @@ export class StatisticsUI {
     private initialize() {
         this.container.innerHTML = `
             <div class="stats-dashboard">
-                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem;">
-                    <button class="btn-secondary" id="btn-clear-data" style="padding: 0.5rem 1rem; font-size: 0.9rem; border-color: rgba(242, 184, 181, 0.4); color: #f2b8b5;">Clear All Data</button>
-                    <button class="btn-secondary" id="btn-export-json" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Export JSON</button>
-                    <button class="btn-secondary" id="btn-import-json" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Import JSON</button>
-                    <input type="file" id="input-import-json" accept=".json" class="hidden" />
-                </div>
-                
                 <div class="stats-grid">
                     <div class="stat-card minimal-card">
                         <h3>Today</h3>
@@ -48,7 +41,15 @@ export class StatisticsUI {
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h3>Distribution</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3>Distribution</h3>
+                            <select id="stat-distribution-range-select" class="input-field" style="width: auto; padding: 0.25rem; margin: 0; font-size: 0.8rem;">
+                                <option value="today">Today</option>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                                <option value="total" selected>Total</option>
+                            </select>
+                        </div>
                         <div style="max-width: 320px; width: 100%; margin: 0 auto;">
                             <canvas id="chart-ring"></canvas>
                         </div>
@@ -103,14 +104,21 @@ export class StatisticsUI {
                         <!-- timeline items -->
                     </div>
                 </div>
+
+                <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: 1rem;">
+                    <button class="btn-secondary" id="btn-clear-data-bottom" style="padding: 0.5rem 1.5rem; font-size: 0.9rem; border-color: rgba(242, 184, 181, 0.4); color: #f2b8b5;">Clear All Data</button>
+                    <button class="btn-secondary" id="btn-export-json-bottom" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Export JSON</button>
+                    <button class="btn-secondary" id="btn-import-json-bottom" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Import JSON</button>
+                    <input type="file" id="input-import-json" accept=".json" class="hidden" />
+                </div>
             </div>
         `;
 
-        document.getElementById('btn-export-json')!.addEventListener('click', () => {
+        document.getElementById('btn-export-json-bottom')!.addEventListener('click', () => {
             StorageService.exportData();
         });
 
-        const btnImport = document.getElementById('btn-import-json')!;
+        const btnImport = document.getElementById('btn-import-json-bottom')!;
         const inputImport = document.getElementById('input-import-json') as HTMLInputElement;
 
         btnImport.addEventListener('click', () => {
@@ -135,7 +143,7 @@ export class StatisticsUI {
             }
         });
 
-        document.getElementById('btn-clear-data')!.addEventListener('click', async () => {
+        document.getElementById('btn-clear-data-bottom')!.addEventListener('click', async () => {
             if (window.confirm('Are you sure you want to clear all session data? This cannot be undone.')) {
                 await StorageService.clearSessions();
                 this.render();
@@ -143,6 +151,10 @@ export class StatisticsUI {
         });
 
         document.getElementById('stat-range-select')!.addEventListener('change', () => {
+            this.render();
+        });
+
+        document.getElementById('stat-distribution-range-select')!.addEventListener('change', () => {
             this.render();
         });
     }
@@ -162,14 +174,17 @@ export class StatisticsUI {
         const rangeSessions = StatisticsHelpers.filterByRange(sessions, rangeStr);
         document.getElementById('stat-range-focus')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getFocusTimeMin(rangeSessions));
 
-        this.renderGraphs(rangeSessions, tagMap);
+        const distRangeStr = (document.getElementById('stat-distribution-range-select') as HTMLSelectElement).value as any;
+        const distSessions = StatisticsHelpers.filterByRange(sessions, distRangeStr);
+
+        this.renderGraphs(rangeSessions, distSessions, tagMap);
         this.renderProductiveHours(sessions, tagMap);
         this.renderYearlyHeatmap(sessions);
         this.renderTimeline(rangeSessions.filter(s => !s.is_break), tagMap);
     }
 
-    private renderGraphs(sessions: Session[], tagMap: Map<string, Tag>) {
-        const focusSessions = sessions.filter(s => !s.is_break);
+    private renderGraphs(compareSessions: Session[], distributionSessions: Session[], tagMap: Map<string, Tag>) {
+        const focusSessions = distributionSessions.filter(s => !s.is_break);
         
         // Ring Graph
         const groupedByTag: Record<string, number> = {};
@@ -209,9 +224,9 @@ export class StatisticsUI {
         if(this.lineChartInstance) this.lineChartInstance.destroy();
         
         // aggregate by day for line graph
-        const daysRaw = [...new Set(sessions.map(s => s.end.split('T')[0]))].sort();
-        const focusData = daysRaw.map(d => sessions.filter(s => s.end.startsWith(d) && !s.is_break).reduce((a,b)=>a+b.duration, 0));
-        const intData = daysRaw.map(d => sessions.filter(s => s.end.startsWith(d)).reduce((a,b)=>a+b.interruptions, 0));
+        const daysRaw = [...new Set(compareSessions.map(s => s.end.split('T')[0]))].sort();
+        const focusData = daysRaw.map(d => compareSessions.filter(s => s.end.startsWith(d) && !s.is_break).reduce((a,b)=>a+b.duration, 0));
+        const intData = daysRaw.map(d => compareSessions.filter(s => s.end.startsWith(d)).reduce((a,b)=>a+b.interruptions, 0));
 
         this.lineChartInstance = new Chart(lineCtx, {
             type: 'bar',
