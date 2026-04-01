@@ -110,6 +110,11 @@ export class TimerUI {
         notesInput.addEventListener('change', (e) => {
             this.timerService.setNotes((e.target as HTMLInputElement).value);
         });
+
+        const btnZenToggle = document.getElementById('btn-zen-toggle')!;
+        btnZenToggle.addEventListener('click', () => {
+            document.body.classList.toggle('zen-mode');
+        });
     }
 
     private formatTime(totalSeconds: number) {

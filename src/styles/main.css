@@ -13,6 +13,13 @@ header {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 header h1 {
@@ -236,16 +243,59 @@ main {
   background: rgba(0, 0, 0, 0.4);
 }
 
-.tag-forge-card {
-  background: var(--sys-color-surface);
-  backdrop-filter: blur(var(--sys-blur));
-  -webkit-backdrop-filter: blur(var(--sys-blur));
-  border: 1px solid var(--sys-color-outline);
-  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.6);
-  border-radius: var(--shape-large) !important;
-  animation: forgeOpen 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+/* Zen Mode */
+body.zen-mode {
+  background-color: #000000 !important;
+  background-image: none !important;
+  overflow: hidden;
 }
 
+body.zen-mode header,
+body.zen-mode #active-tag-badge,
+body.zen-mode .idle-controls,
+body.zen-mode .interruptions-display,
+body.zen-mode .notes-input,
+body.zen-mode #timer-controls {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Show on Hover */
+body.zen-mode #app:hover header,
+body.zen-mode #app:hover #active-tag-badge,
+body.zen-mode #app:hover #timer-controls,
+body.zen-mode #app:hover .notes-input {
+  opacity: 0.8;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+body.zen-mode .timer-dial {
+  transform: scale(1.1);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Restore minimal dial fill on hover in Zen Mode */
+body.zen-mode #app:hover .timer-dial {
+  background: var(--sys-color-surface) !important;
+  box-shadow: 
+    inset 0 0 80px rgba(0,0,0,0.3),
+    0 20px 50px -10px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Hide stats button in zen mode even on hover to keep it clean */
+body.zen-mode #btn-stats-toggle {
+  display: none;
+}
+
+/* Ensure zen toggle is always accessible in zen mode on hover */
+body.zen-mode #btn-zen-toggle {
+  color: var(--sys-color-primary);
+}
 @keyframes forgeOpen {
   from { opacity: 0; transform: scale(0.9) translateY(20px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
