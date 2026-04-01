@@ -138,15 +138,30 @@ export class TimerUI {
         
         // Update Tag and fetch session count occasionally
         if (tag) {
-            tagBadge.style.backgroundColor = tag.color;
+            tagBadge.style.setProperty('--tag-color', tag.color);
+            tagBadge.style.backgroundColor = 'transparent'; // Let CSS handle the glass look
             if (this.lastCountTagId !== tag.id || state === 'IdleAfterFocus') {
                 this.timerService.getTodaySessionCountForTag().then(c => {
                     this.lastCountValue = c;
                     this.lastCountTagId = tag.id;
-                    tagBadge.innerHTML = `${tag.name} <span class="tag-session-count">${c}</span>`;
+                    tagBadge.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
+                        <span class="tag-badge-name">${tag.name}</span>
+                        <span class="tag-session-count">${c}</span>
+                    `;
                 });
             } else {
-                tagBadge.innerHTML = `${tag.name} <span class="tag-session-count">${this.lastCountValue}</span>`;
+                tagBadge.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                    <span class="tag-badge-name">${tag.name}</span>
+                    <span class="tag-session-count">${this.lastCountValue}</span>
+                `;
             }
         }
 

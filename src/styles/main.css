@@ -202,9 +202,17 @@ main {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.tags-manager-view .tag-badge {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
 .tag-badge:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.tags-manager-view .tag-badge:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
 }
 
 .btn-edit-tag {
