@@ -33,37 +33,36 @@ main {
 
 /* Material You Buttons */
 .btn-primary {
-  background: linear-gradient(135deg, var(--sys-color-primary-container), var(--sys-color-primary));
-  color: var(--sys-color-on-primary-container);
-  padding: 1rem 2rem;
-  border-radius: var(--shape-full);
+  background: var(--sys-color-primary);
+  color: var(--sys-color-on-primary);
+  padding: 1rem 2.5rem;
+  border-radius: var(--shape-medium);
   font-size: 1.1rem;
-  font-weight: 500;
-  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.2);
+  font-weight: 600;
+  box-shadow: 0 10px 20px -10px var(--sys-color-primary);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.5px;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--sys-color-primary), var(--sys-color-primary-container));
-  color: var(--sys-color-on-primary);
+  filter: brightness(1.1);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 15px 30px -12px var(--sys-color-primary);
 }
 
 .btn-secondary {
   background-color: var(--sys-color-surface-variant);
   color: var(--sys-color-on-surface);
   padding: 0.75rem 1.5rem;
-  border-radius: var(--shape-full);
+  border-radius: var(--shape-medium);
   font-size: 1rem;
   font-weight: 500;
   border: 1px solid var(--sys-color-outline);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--sys-blur));
 }
 
 .btn-secondary:hover {
-  background-color: var(--sys-color-secondary-container);
-  color: var(--sys-color-on-secondary-container);
+  background-color: rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
 }
 
@@ -86,12 +85,12 @@ main {
 /* Cards */
 .card {
   background-color: var(--sys-color-surface);
-  border-radius: var(--shape-extra-large);
-  padding: 2rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  border-radius: var(--shape-large);
+  padding: 2.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   border: 1px solid var(--sys-color-outline);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--sys-blur));
+  -webkit-backdrop-filter: blur(var(--sys-blur));
 }
 
 /* Modal */
@@ -119,47 +118,58 @@ main {
 }
 
 .modal-content {
-  background-color: var(--sys-color-background);
-  background-image: radial-gradient(circle at top right, rgba(139, 92, 246, 0.1), transparent 40%);
+  background-color: var(--sys-color-surface);
   border: 1px solid var(--sys-color-outline);
-  border-radius: var(--shape-extra-large);
-  padding: 2rem;
+  border-radius: var(--shape-large);
+  padding: 2.5rem;
   width: 90%;
   max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
-  backdrop-filter: blur(16px);
+  box-shadow: 0 32px 64px -12px rgba(0,0,0,0.7);
+  backdrop-filter: blur(var(--sys-blur));
+  -webkit-backdrop-filter: blur(var(--sys-blur));
 }
 
 .close-button {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--sys-color-on-background);
-  font-size: 2rem;
+  font-size: 1.5rem;
   line-height: 1;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Inputs */
 .input-field {
   background-color: var(--sys-color-surface-variant);
   color: var(--sys-color-on-surface);
-  border: none;
-  border-bottom: 2px solid var(--sys-color-primary);
-  border-radius: var(--shape-small) var(--shape-small) 0 0;
-  padding: 1rem;
+  border: 1px solid var(--sys-color-outline);
+  border-radius: var(--shape-small);
+  padding: 1rem 1.25rem;
   font-size: 1rem;
   width: 100%;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .input-field:focus {
   outline: none;
-  background-color: var(--sys-color-secondary-container);
-  border-bottom-color: var(--sys-color-primary-container);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--sys-color-primary);
+  box-shadow: 0 0 0 4px var(--sys-color-primary-container);
 }
 
 /* Utils */
@@ -219,12 +229,12 @@ main {
 }
 
 .tag-forge-card {
-  background: rgba(30, 30, 35, 0.85);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border-radius: 24px !important;
+  background: var(--sys-color-surface);
+  backdrop-filter: blur(var(--sys-blur));
+  -webkit-backdrop-filter: blur(var(--sys-blur));
+  border: 1px solid var(--sys-color-outline);
+  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.6);
+  border-radius: var(--shape-large) !important;
   animation: forgeOpen 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

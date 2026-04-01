@@ -1,26 +1,26 @@
 :root {
-  /* Glassmorphism Dark Theme Palette */
-  --sys-color-background: #0f172a; /* deep slate */
+  /* Matte Dark Theme Palette */
+  --sys-color-background: #0b0c10; /* darker, more neutral */
   --sys-color-on-background: #f8fafc;
   
-  --sys-color-surface: rgba(30, 41, 59, 0.6);
-  --sys-color-surface-variant: rgba(51, 65, 85, 0.5);
+  --sys-color-surface: rgba(30, 30, 35, 0.85); 
+  --sys-color-surface-variant: rgba(255, 255, 255, 0.03);
   --sys-color-on-surface: #f1f5f9;
   
-  --sys-color-primary: #a78bfa;
-  --sys-color-on-primary: #1e1b4b;
-  --sys-color-primary-container: rgba(139, 92, 246, 0.2);
-  --sys-color-on-primary-container: #ddd6fe;
+  --sys-color-primary: #d0bcff; /* M3-like light purple */
+  --sys-color-on-primary: #381e72;
+  --sys-color-primary-container: rgba(139, 92, 246, 0.15);
+  --sys-color-on-primary-container: #eaddff;
   
-  --sys-color-secondary: #38bdf8;
+  --sys-color-secondary: #7dd3fc;
   --sys-color-on-secondary: #082f49;
-  --sys-color-secondary-container: rgba(14, 165, 233, 0.2);
+  --sys-color-secondary-container: rgba(125, 211, 252, 0.1);
   --sys-color-on-secondary-container: #bae6fd;
 
-  --sys-color-error: #fb7185;
-  --sys-color-on-error: #4c0519;
+  --sys-color-error: #f2b8b5;
+  --sys-color-on-error: #601410;
   
-  --sys-color-outline: rgba(148, 163, 184, 0.2);
+  --sys-color-outline: rgba(255, 255, 255, 0.1);
 
   /* Typography */
   --font-family: 'Outfit', system-ui, sans-serif;
@@ -31,6 +31,9 @@
   --shape-large: 24px;
   --shape-extra-large: 32px;
   --shape-full: 9999px;
+  
+  /* Effects */
+  --sys-blur: 40px;
   
   /* Transitions */
   --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);

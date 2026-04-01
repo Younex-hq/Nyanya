@@ -8,13 +8,16 @@
 
 .timer-dial {
   position: relative;
-  width: 320px;
-  height: 320px;
+  width: 340px;
+  height: 340px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--sys-color-outline);
   background: var(--sys-color-surface);
-  backdrop-filter: blur(12px);
-  box-shadow: inset 0 0 40px rgba(0,0,0,0.4), 0 10px 40px rgba(0,0,0,0.3);
+  backdrop-filter: blur(var(--sys-blur));
+  -webkit-backdrop-filter: blur(var(--sys-blur));
+  box-shadow: 
+    inset 0 0 80px rgba(0,0,0,0.3),
+    0 20px 50px -10px rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
