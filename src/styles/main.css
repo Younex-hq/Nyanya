@@ -108,6 +108,11 @@ main {
   transition: opacity var(--md-sys-motion-duration-medium) ease;
 }
 
+#tags-wrapper-modal,
+#tag-modal {
+  z-index: 1100;
+}
+
 .modal.hidden {
   opacity: 0;
   pointer-events: none;

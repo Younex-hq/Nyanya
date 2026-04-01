@@ -50,6 +50,10 @@ async function init() {
     const btnCloseTags = document.getElementById('btn-close-tags')!;
     btnCloseTags.addEventListener('click', () => {
         tagsWrapperModal.classList.add('hidden');
+        // Refresh Stats if open to show new/edited tags
+        if (!statsModal.classList.contains('hidden')) {
+            statsUI.render();
+        }
     });
 }
 

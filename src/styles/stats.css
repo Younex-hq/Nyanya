@@ -4,6 +4,16 @@
   gap: 2rem;
 }
 
+.modal-content h2 {
+  text-align: center;
+  margin-top: -0.5rem;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--sys-color-primary);
+  letter-spacing: -0.5px;
+}
+
 .stat-row-group {
   display: flex;
   flex-direction: column;
@@ -237,4 +247,58 @@
 
 .btn-icon-small:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.stats-tags-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  justify-content: center;
+}
+
+.tag-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--shape-full);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--sys-color-on-surface-variant);
+  transition: all 0.2s ease;
+}
+
+.tag-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.tag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.add-tag-pill {
+  border-style: dashed;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  color: var(--sys-color-primary);
+}
+
+.add-tag-pill:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-style: solid;
+  border-color: var(--sys-color-primary);
+}
+
+.tag-plus {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
 }

@@ -17,6 +17,7 @@ export class StatisticsUI {
     private initialize() {
         this.container.innerHTML = `
             <div class="stats-dashboard">
+                <div id="stats-tags-legend" class="stats-tags-legend"></div>
                 <!-- 1. Today Stats -->
                 <div class="stats-group-container">
                     <div class="stat-card minimal-card">
@@ -185,6 +186,35 @@ export class StatisticsUI {
         this.renderProductiveHours(sessions, tagMap);
         this.renderTimelineOnly();
         this.renderYearlyHeatmap(sessions);
+        this.renderTagLegend(tags);
+    }
+
+    private renderTagLegend(tags: Tag[]) {
+        const legend = document.getElementById('stats-tags-legend')!;
+        legend.innerHTML = '';
+        
+        tags.forEach(tag => {
+            const pill = document.createElement('div');
+            pill.className = 'tag-pill';
+            pill.innerHTML = `
+                <span class="tag-dot" style="background-color: ${tag.color}"></span>
+                <span class="tag-name">${tag.name}</span>
+            `;
+            legend.appendChild(pill);
+        });
+
+        // Add Tag Button Pill
+        const addPill = document.createElement('div');
+        addPill.className = 'tag-pill add-tag-pill';
+        addPill.id = 'btn-add-tag-from-stats';
+        addPill.innerHTML = `
+            <span class="tag-plus">+</span>
+            <span class="tag-name">Add Tag</span>
+        `;
+        addPill.addEventListener('click', () => {
+            document.getElementById('tags-wrapper-modal')?.classList.remove('hidden');
+        });
+        legend.appendChild(addPill);
     }
 
     private async renderTimelineOnly() {
