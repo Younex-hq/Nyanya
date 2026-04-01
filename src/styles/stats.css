@@ -145,10 +145,10 @@
 
 /* Intensity colors for Yearly Heatmap */
 .heatmap-cell[data-intensity="0"] { background-color: #1a1a1f; }
-.heatmap-cell[data-intensity="1"] { background-color: #2c1b4d; }
-.heatmap-cell[data-intensity="2"] { background-color: #4b327b; }
-.heatmap-cell[data-intensity="3"] { background-color: #7250b8; }
-.heatmap-cell[data-intensity="4"] { background-color: #9c7bdf; }
+.heatmap-cell[data-intensity="1"] { background-color: color-mix(in srgb, var(--sys-color-primary), transparent 80%); }
+.heatmap-cell[data-intensity="2"] { background-color: color-mix(in srgb, var(--sys-color-primary), transparent 60%); }
+.heatmap-cell[data-intensity="3"] { background-color: color-mix(in srgb, var(--sys-color-primary), transparent 30%); }
+.heatmap-cell[data-intensity="4"] { background-color: var(--sys-color-primary); }
 
 .timeline-list {
   display: flex;

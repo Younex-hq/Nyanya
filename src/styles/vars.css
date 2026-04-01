@@ -63,3 +63,23 @@ button {
 input {
   font-family: inherit;
 }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sys-color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--sys-color-primary), transparent 70%);
+  border-radius: var(--shape-full);
+  border: 2px solid var(--sys-color-background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sys-color-primary);
+}
