@@ -44,8 +44,8 @@ body {
   margin: 0;
   background-color: var(--sys-color-background);
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.15), transparent 25%);
+    radial-gradient(circle at 15% 50%, var(--sys-color-primary-container), transparent 25%),
+    radial-gradient(circle at 85% 30%, var(--sys-color-secondary-container), transparent 25%);
   background-attachment: fixed;
   color: var(--sys-color-on-background);
   font-family: var(--font-family);

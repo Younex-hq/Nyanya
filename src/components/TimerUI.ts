@@ -138,6 +138,7 @@ export class TimerUI {
         
         // Update Tag and fetch session count occasionally
         if (tag) {
+            this.updateDynamicTheme(tag.color);
             tagBadge.style.setProperty('--tag-color', tag.color);
             tagBadge.style.backgroundColor = 'transparent'; // Let CSS handle the glass look
             if (this.lastCountTagId !== tag.id || state === 'IdleAfterFocus') {
@@ -163,6 +164,8 @@ export class TimerUI {
                     <span class="tag-session-count">${this.lastCountValue}</span>
                 `;
             }
+        } else {
+            this.updateDynamicTheme('#d0bcff'); // Default purple
         }
 
         // Update Dial
@@ -217,5 +220,17 @@ export class TimerUI {
         } else {
             intDisplay.classList.add('hidden');
         }
+    }
+
+    private updateDynamicTheme(color: string) {
+        const root = document.documentElement;
+        root.style.setProperty('--sys-color-primary', color);
+        // Add transparency for containers (using hex alpha or rgba)
+        // If color is #RRGGBB, we can add 26 for ~15% opacity
+        const containerColor = color.length === 7 ? color + '26' : color; 
+        const containerColorSecondary = color.length === 7 ? color + '1a' : color; // 10%
+
+        root.style.setProperty('--sys-color-primary-container', containerColor);
+        root.style.setProperty('--sys-color-secondary-container', containerColorSecondary);
     }
 }
