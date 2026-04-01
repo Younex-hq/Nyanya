@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Web App</title>
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="stylesheet" href="./src/styles/vars.css" />
+    <link rel="stylesheet" href="./src/styles/main.css" />
+    <link rel="stylesheet" href="./src/styles/timer.css" />
+    <link rel="stylesheet" href="./src/styles/stats.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Pomodoro</h1>
+        <button id="btn-stats-toggle" class="icon-button">Stats</button>
+      </header>
+
+      <main>
+        <section id="timer-section">
+          <!-- Timer UI goes here via JS -->
+        </section>
+
+        <section id="tags-section">
+          <!-- Tags Manager UI goes here via JS -->
+        </section>
+      </main>
+      
+      <!-- Modal for statistics -->
+      <div id="stats-modal" class="modal hidden">
+        <div class="modal-content stats-dashboard">
+          <button id="btn-close-stats" class="close-button">&times;</button>
+          <h2>Statistics</h2>
+          <div id="stats-container">
+            <!-- Stats UI gets injected here -->
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

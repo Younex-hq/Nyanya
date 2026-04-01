@@ -1,0 +1,57 @@
+:root {
+  /* Material You Dark Theme Palette */
+  --sys-color-background: #1c1b1f;
+  --sys-color-on-background: #e6e1e5;
+  
+  --sys-color-surface: #2b2930;
+  --sys-color-surface-variant: #49454f;
+  --sys-color-on-surface: #e6e1e5;
+  
+  --sys-color-primary: #d0bcff;
+  --sys-color-on-primary: #381e72;
+  --sys-color-primary-container: #4f378b;
+  --sys-color-on-primary-container: #eaddff;
+  
+  --sys-color-secondary: #ccc2dc;
+  --sys-color-on-secondary: #332d41;
+  --sys-color-secondary-container: #4a4458;
+  --sys-color-on-secondary-container: #e8def8;
+
+  --sys-color-error: #f2b8b5;
+  --sys-color-on-error: #601410;
+  
+  --sys-color-outline: #938f99;
+
+  /* Typography */
+  --font-family: 'Roboto', 'Inter', system-ui, sans-serif;
+  
+  /* Shapes */
+  --shape-small: 8px;
+  --shape-medium: 12px;
+  --shape-large: 16px;
+  --shape-extra-large: 28px;
+  --shape-full: 9999px;
+  
+  /* Transitions */
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-duration-medium: 400ms;
+}
+
+body {
+  margin: 0;
+  background-color: var(--sys-color-background);
+  color: var(--sys-color-on-background);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  transition: all var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized);
+}
+
+input {
+  font-family: inherit;
+}

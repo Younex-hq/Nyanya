@@ -1,0 +1,154 @@
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  flex: 1;
+}
+
+/* Material You Buttons */
+.btn-primary {
+  background-color: var(--sys-color-primary-container);
+  color: var(--sys-color-on-primary-container);
+  padding: 1rem 2rem;
+  border-radius: var(--shape-full);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background-color: var(--sys-color-primary);
+  color: var(--sys-color-on-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(208, 188, 255, 0.2);
+}
+
+.btn-secondary {
+  background-color: var(--sys-color-surface-variant);
+  color: var(--sys-color-on-surface);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--shape-full);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.btn-secondary:hover {
+  background-color: var(--sys-color-secondary-container);
+  color: var(--sys-color-on-secondary-container);
+}
+
+.btn-icon {
+  background: transparent;
+  color: var(--sys-color-on-surface);
+  border-radius: var(--shape-full);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.btn-icon:hover {
+  background-color: var(--sys-color-surface-variant);
+}
+
+/* Cards */
+.card {
+  background-color: var(--sys-color-surface);
+  border-radius: var(--shape-extra-large);
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity var(--md-sys-motion-duration-medium) ease;
+}
+
+.modal.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-content {
+  background-color: var(--sys-color-background);
+  border-radius: var(--shape-extra-large);
+  padding: 2rem;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  color: var(--sys-color-on-background);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+/* Inputs */
+.input-field {
+  background-color: var(--sys-color-surface-variant);
+  color: var(--sys-color-on-surface);
+  border: none;
+  border-bottom: 2px solid var(--sys-color-primary);
+  border-radius: var(--shape-small) var(--shape-small) 0 0;
+  padding: 1rem;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-field:focus {
+  outline: none;
+  background-color: var(--sys-color-secondary-container);
+  border-bottom-color: var(--sys-color-primary-container);
+}
+
+/* Utils */
+.hidden { display: none !important; }
+
+@media (max-width: 768px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
