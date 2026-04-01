@@ -1,14 +1,17 @@
 import { TimerService } from '../services/TimerService.ts';
+import { TagsUI } from './TagsUI.ts';
 
 export class TimerUI {
     private container: HTMLElement;
     private timerService: TimerService;
+    private tagsUI: TagsUI;
     private lastCountTagId: number | undefined = -1;
     private lastCountValue: number = 0;
 
-    constructor(container: HTMLElement, timerService: TimerService) {
+    constructor(container: HTMLElement, timerService: TimerService, tagsUI: TagsUI) {
         this.container = container;
         this.timerService = timerService;
+        this.tagsUI = tagsUI;
         this.initialize();
         this.timerService.addEventListener('change', () => this.render());
     }
@@ -16,8 +19,7 @@ export class TimerUI {
     private initialize() {
         this.container.innerHTML = `
             <div class="timer-container">
-                <div class="tag-badge" id="active-tag-badge" style="margin-bottom: 0.5rem;">No Tag</div>
-                <button class="btn-secondary" id="btn-change-tag" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; margin-bottom: 1rem;">Change Session Tag</button>
+                <div class="tag-badge interactive-tag" id="active-tag-badge" style="margin-bottom: 1.5rem;" title="Click to change tag (saves progress if paused)">No Tag</div>
                 <div class="session-counter" id="session-counter" style="margin-bottom: 1rem; opacity: 0.8;">Today: 0 sessions</div>
                 
                 <div class="timer-dial" id="timer-dial">
@@ -28,6 +30,8 @@ export class TimerUI {
                 <div class="timer-controls" id="timer-controls">
                     <button class="btn-primary" id="btn-main">Start Focus</button>
                     <button class="btn-secondary hidden" id="btn-secondary">Pause</button>
+                    <button class="btn-secondary hidden" id="btn-restart">Restart</button>
+                    <button class="btn-secondary hidden" id="btn-skip-focus">Skip to Break</button>
                     <button class="btn-secondary hidden" id="btn-skip-break">Skip Break</button>
                 </div>
                 
@@ -67,9 +71,26 @@ export class TimerUI {
             }
         });
 
-        const btnChangeTag = document.getElementById('btn-change-tag')!;
-        btnChangeTag.addEventListener('click', () => {
+        const activeTagBadge = document.getElementById('active-tag-badge')!;
+        activeTagBadge.addEventListener('click', () => {
+            const state = this.timerService.getState();
+            if (state !== 'Idle' && state !== 'IdleAfterFocus' && state !== 'FocusPaused') return;
+            this.tagsUI.setManagementMode(false);
             document.getElementById('tags-wrapper-modal')!.classList.remove('hidden');
+        });
+
+        const btnRestart = document.getElementById('btn-restart')!;
+        btnRestart.addEventListener('click', () => {
+            if (this.timerService.getState() === 'FocusPaused') {
+                this.timerService.restartFocus();
+            }
+        });
+
+        const btnSkipFocus = document.getElementById('btn-skip-focus')!;
+        btnSkipFocus.addEventListener('click', () => {
+            if (this.timerService.getState() === 'FocusPaused') {
+                this.timerService.skipFocusToBreak();
+            }
         });
 
         btnSecondary.addEventListener('click', () => {
@@ -111,6 +132,8 @@ export class TimerUI {
         const intDisplay = document.getElementById('interruptions-display')!;
         const intTime = document.getElementById('interruptions-time')!;
         const sessionCounter = document.getElementById('session-counter')!;
+        const btnRestart = document.getElementById('btn-restart')!;
+        const btnSkipFocus = document.getElementById('btn-skip-focus')!;
 
         const state = this.timerService.getState();
         const tag = this.timerService.activeTag;
@@ -137,6 +160,10 @@ export class TimerUI {
         timeDisplay.textContent = this.formatTime(this.timerService.timeRemainingSeconds);
         stateLabel.textContent = state.replace(/([A-Z])/g, ' $1').trim().toUpperCase(); // 'IdleAfterFocus' -> 'IDLE AFTER FOCUS'
 
+        // Default: hide extras 
+        btnRestart.classList.add('hidden');
+        btnSkipFocus.classList.add('hidden');
+
         // Idle display
         if (state === 'IdleAfterFocus') {
             idleControls.classList.remove('hidden');
@@ -161,6 +188,8 @@ export class TimerUI {
                 btnMain.textContent = 'Resume';
                 btnMain.classList.remove('hidden');
                 btnSecondary.classList.add('hidden');
+                btnRestart.classList.remove('hidden');
+                btnSkipFocus.classList.remove('hidden');
                 btnSkipBreak.classList.add('hidden');
             } else if (state === 'Break') {
                 btnMain.classList.add('hidden');

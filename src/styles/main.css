@@ -165,6 +165,56 @@ main {
 /* Utils */
 .hidden { display: none !important; }
 
+.tag-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--shape-large);
+  font-weight: 500;
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tag-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-edit-tag {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--shape-small);
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.btn-edit-tag:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.danger-button {
+  background-color: var(--sys-color-error-container, #852221) !important;
+  color: var(--sys-color-on-error-container, #f9dedc) !important;
+  border-color: rgba(242, 184, 181, 0.3) !important;
+}
+
+.danger-button:hover {
+  background-color: #b3261e !important;
+  color: white !important;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

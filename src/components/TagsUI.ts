@@ -6,6 +6,7 @@ export class TagsUI {
     private container: HTMLElement;
     private timerService: TimerService;
     private tags: Tag[] = [];
+    private isManagementMode: boolean = false;
 
     constructor(container: HTMLElement, timerService: TimerService) {
         this.container = container;
@@ -54,7 +55,10 @@ export class TagsUI {
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn-primary" style="margin-top: 1rem;">Save Tag</button>
+                        <div style="display:flex; gap: 1rem; margin-top: 1rem;">
+                            <button type="submit" class="btn-primary" style="flex: 1;">Save Tag</button>
+                            <button type="button" id="btn-delete-tag" class="btn-secondary danger-button hidden" style="flex: 1;">Delete Tag</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -79,10 +83,23 @@ export class TagsUI {
             el.style.backgroundColor = tag.color;
             el.style.cursor = 'pointer';
             // Determine active outline
+            el.style.backgroundColor = tag.color;
+            el.style.cursor = 'pointer';
+            // Determine active outline
             if (this.timerService.activeTag?.id === tag.id) {
                 el.style.border = '2px solid white';
             }
-            el.textContent = tag.name;
+            el.innerHTML = `
+                <span class="tag-badge-name">${tag.name}</span>
+                ${this.isManagementMode ? `
+                <button class="btn-edit-tag" title="Edit Tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
+                ` : ''}
+            `;
             
             el.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -90,6 +107,15 @@ export class TagsUI {
                 this.renderList(); // re-render to show active
                 document.getElementById('tags-wrapper-modal')?.classList.add('hidden');
             });
+
+            // Edit button specific listener
+            if (this.isManagementMode) {
+                el.querySelector('.btn-edit-tag')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openEditModal(tag);
+                });
+            }
+
             list.appendChild(el);
         });
         
@@ -107,11 +133,29 @@ export class TagsUI {
             form.reset();
             (document.getElementById('tag-id') as HTMLInputElement).value = '';
             document.getElementById('tag-modal-title')!.textContent = 'Create Tag';
+            document.getElementById('btn-delete-tag')!.classList.add('hidden');
             modal.classList.remove('hidden');
         });
 
         btnClose.addEventListener('click', () => {
             modal.classList.add('hidden');
+        });
+
+        const btnDelete = document.getElementById('btn-delete-tag')!;
+        btnDelete.addEventListener('click', async () => {
+            const idVal = (document.getElementById('tag-id') as HTMLInputElement).value;
+            if (idVal && window.confirm('Are you sure you want to delete this tag? Historical data will remain, but the tag preset will be lost.')) {
+                const id = parseInt(idVal);
+                await StorageService.deleteTag(id);
+                
+                // Sync with TimerService
+                if (this.timerService.activeTag?.id === id) {
+                    this.timerService.activeTag = null;
+                }
+                
+                await this.loadTags();
+                modal.classList.add('hidden');
+            }
         });
 
         form.addEventListener('submit', async (e) => {
@@ -139,5 +183,29 @@ export class TagsUI {
         });
         
         this.timerService.addEventListener('change', () => this.renderList());
+    }
+
+    private openEditModal(tag: Tag) {
+        const modal = document.getElementById('tag-modal')!;
+        const form = document.getElementById('tag-form') as HTMLFormElement;
+        const btnDelete = document.getElementById('btn-delete-tag')!;
+        
+        form.reset();
+        document.getElementById('tag-modal-title')!.textContent = 'Edit Tag';
+        (document.getElementById('tag-id') as HTMLInputElement).value = tag.id!.toString();
+        (document.getElementById('tag-name') as HTMLInputElement).value = tag.name;
+        (document.getElementById('tag-color') as HTMLInputElement).value = tag.color;
+        (document.getElementById('tag-focus') as HTMLInputElement).value = tag.focusTime.toString();
+        (document.getElementById('tag-break') as HTMLInputElement).value = tag.breakTime.toString();
+        (document.getElementById('tag-longbreak') as HTMLInputElement).value = tag.longBreakTime.toString();
+        (document.getElementById('tag-sessionslb') as HTMLInputElement).value = tag.sessionsBeforeLongBreak.toString();
+        
+        btnDelete.classList.remove('hidden');
+        modal.classList.remove('hidden');
+    }
+
+    public setManagementMode(enabled: boolean) {
+        this.isManagementMode = enabled;
+        this.renderList();
     }
 }

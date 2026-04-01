@@ -21,9 +21,9 @@ async function init() {
     const tagsSection = document.getElementById('tags-section')!;
     const statsContainer = document.getElementById('stats-container')!;
     
-    new TimerUI(timerSection, timerService);
-    new TagsUI(tagsSection, timerService);
-    const statsUI = new StatisticsUI(statsContainer);
+    const tagsUI = new TagsUI(tagsSection, timerService);
+    new TimerUI(timerSection, timerService, tagsUI);
+    const statsUI = new StatisticsUI(statsContainer, tagsUI);
 
     // Initial load setup
     const tags = await StorageService.getTags();

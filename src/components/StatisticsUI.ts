@@ -2,15 +2,18 @@ import Chart from 'chart.js/auto';
 import { StorageService } from '../services/StorageService.ts';
 import { StatisticsHelpers } from '../utils/StatisticsHelpers.ts';
 import type { Session, Tag } from '../models/types.ts';
+import { TagsUI } from './TagsUI.ts';
 
 export class StatisticsUI {
     private container: HTMLElement;
+    private tagsUI: TagsUI;
     private ringChartInstance: Chart | null = null;
     private lineChartInstance: Chart | null = null;
     private timelineDate: Date = new Date();
 
-    constructor(container: HTMLElement) {
+    constructor(container: HTMLElement, tagsUI: TagsUI) {
         this.container = container;
+        this.tagsUI = tagsUI;
         this.initialize();
     }
 
@@ -203,18 +206,24 @@ export class StatisticsUI {
             legend.appendChild(pill);
         });
 
-        // Add Tag Button Pill
-        const addPill = document.createElement('div');
-        addPill.className = 'tag-pill add-tag-pill';
-        addPill.id = 'btn-add-tag-from-stats';
-        addPill.innerHTML = `
-            <span class="tag-plus">+</span>
-            <span class="tag-name">Add Tag</span>
+        // Edit Tags Button Pill
+        const editPills = document.createElement('div');
+        editPills.className = 'tag-pill add-tag-pill';
+        editPills.id = 'btn-add-tag-from-stats';
+        editPills.innerHTML = `
+            <span class="tag-plus">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+            </span>
+            <span class="tag-name">Edit Tags</span>
         `;
-        addPill.addEventListener('click', () => {
+        editPills.addEventListener('click', () => {
+            this.tagsUI.setManagementMode(true);
             document.getElementById('tags-wrapper-modal')?.classList.remove('hidden');
         });
-        legend.appendChild(addPill);
+        legend.appendChild(editPills);
     }
 
     private async renderTimelineOnly() {

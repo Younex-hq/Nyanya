@@ -29,10 +29,38 @@ export class TimerService extends EventTarget {
     }
 
     setTag(tag: Tag) {
-        if (this.state !== 'Idle' && this.state !== 'IdleAfterFocus') return;
+        const canSwitchDirectly = (this.state === 'Idle' || this.state === 'IdleAfterFocus');
+        const isPausedDuringFocus = (this.state === 'FocusPaused');
+
+        if (!canSwitchDirectly && !isPausedDuringFocus) return;
+
+        if (isPausedDuringFocus) {
+            this.stopPausingTicker();
+            
+            // Calculate actual duration in minutes
+            const elapsedSeconds = (this.targetDurationMinutes * 60) - this.timeRemainingSeconds;
+            const actualDurationMinutes = Math.max(1 / 60, elapsedSeconds / 60);
+
+            // Save partial session only if it's at least 59 seconds
+            if (elapsedSeconds >= 59) {
+                StorageService.saveSession({
+                    end: new Date().toISOString(),
+                    duration: actualDurationMinutes,
+                    interruptions: this.interruptionSeconds / 60,
+                    label: this.activeTag?.name || 'Default',
+                    notes: this.currentSessionNotes,
+                    is_break: false,
+                    archived: false
+                });
+            }
+            this.currentSessionNotes = '';
+            this.state = 'Idle';
+        }
+
         this.activeTag = tag;
         this.targetDurationMinutes = tag.focusTime;
         this.timeRemainingSeconds = tag.focusTime * 60;
+        this.interruptionSeconds = 0;
         this.notify();
     }
 
@@ -68,6 +96,64 @@ export class TimerService extends EventTarget {
             this.startPausingTicker();
             this.notify();
         }
+    }
+
+    restartFocus() {
+        if (this.state === 'FocusPaused' || this.state === 'Focus') {
+            this.stopTicker();
+            this.stopPausingTicker();
+            this.state = 'Focus';
+            this.timeRemainingSeconds = this.activeTag ? this.activeTag.focusTime * 60 : 25 * 60;
+            this.interruptionSeconds = 0;
+            this.startTicker();
+            this.notify();
+        }
+    }
+
+    skipFocusToBreak() {
+        if (this.state === 'FocusPaused' || this.state === 'Focus') {
+            this.stopTicker();
+            this.stopPausingTicker();
+            
+            // Calculate actual duration in minutes
+            const elapsedSeconds = (this.targetDurationMinutes * 60) - this.timeRemainingSeconds;
+            const actualDurationMinutes = Math.max(1 / 60, elapsedSeconds / 60);
+
+            // Save session with actual duration only if >= 59 seconds
+            if (elapsedSeconds >= 59) {
+                StorageService.saveSession({
+                    end: new Date().toISOString(),
+                    duration: actualDurationMinutes,
+                    interruptions: this.interruptionSeconds / 60,
+                    label: this.activeTag?.name || 'Default',
+                    notes: this.currentSessionNotes,
+                    is_break: false,
+                    archived: false
+                });
+                this.sessionCount++;
+            }
+
+            this.currentSessionNotes = '';
+            this.startBreakManually();
+            this.notify();
+        }
+    }
+
+    private startBreakManually() {
+        if (!this.activeTag) {
+            this.state = 'Idle';
+            return;
+        }
+        this.state = 'Break';
+        if (this.sessionCount >= this.activeTag.sessionsBeforeLongBreak) {
+            this.targetDurationMinutes = this.activeTag.longBreakTime;
+            this.sessionCount = 0;
+        } else {
+            this.targetDurationMinutes = this.activeTag.breakTime;
+        }
+        this.timeRemainingSeconds = this.targetDurationMinutes * 60;
+        this.interruptionSeconds = 0;
+        this.startTicker();
     }
 
     startBreak() {
