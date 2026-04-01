@@ -209,3 +209,32 @@
   font-variant-numeric: tabular-nums;
   color: var(--sys-color-primary);
 }
+
+.timeline-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--shape-full);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-icon-small {
+  background: transparent;
+  color: var(--sys-color-on-surface);
+  border: none;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--shape-full);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-icon-small:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

@@ -7,6 +7,7 @@ export class StatisticsUI {
     private container: HTMLElement;
     private ringChartInstance: Chart | null = null;
     private lineChartInstance: Chart | null = null;
+    private timelineDate: Date = new Date();
 
     constructor(container: HTMLElement) {
         this.container = container;
@@ -72,7 +73,14 @@ export class StatisticsUI {
                 </div>
 
                 <div class="stat-card">
-                    <h3 style="margin-bottom: 1rem;">Timeline</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>Timeline</h3>
+                        <div class="timeline-nav">
+                            <button id="btn-timeline-prev" class="btn-icon-small">‹</button>
+                            <span id="timeline-date-label" style="font-size: 0.9rem; font-weight: 500; min-width: 100px; text-align: center;">today</span>
+                            <button id="btn-timeline-next" class="btn-icon-small">›</button>
+                        </div>
+                    </div>
                     <div id="timeline-list" class="timeline-list"></div>
                 </div>
 
@@ -144,6 +152,16 @@ export class StatisticsUI {
         document.getElementById('stat-range-select')!.addEventListener('change', () => {
             this.render();
         });
+
+        document.getElementById('btn-timeline-prev')!.addEventListener('click', () => {
+            this.timelineDate.setDate(this.timelineDate.getDate() - 1);
+            this.renderTimelineOnly();
+        });
+
+        document.getElementById('btn-timeline-next')!.addEventListener('click', () => {
+            this.timelineDate.setDate(this.timelineDate.getDate() + 1);
+            this.renderTimelineOnly();
+        });
     }
 
     public async render() {
@@ -165,8 +183,25 @@ export class StatisticsUI {
 
         this.renderGraphs(rangeSessions, tagMap);
         this.renderProductiveHours(sessions, tagMap);
-        this.renderTimeline(rangeSessions.filter(s => !s.is_break), tagMap);
+        this.renderTimelineOnly();
         this.renderYearlyHeatmap(sessions);
+    }
+
+    private async renderTimelineOnly() {
+        const sessions = await StorageService.getSessions();
+        const tags = await StorageService.getTags();
+        const tagMap = new Map(tags.map(t => [t.name, t]));
+
+        const dateStr = this.timelineDate.toISOString().split('T')[0];
+        const timelineSessions = sessions.filter(s => s.end.startsWith(dateStr) && !s.is_break);
+        this.renderTimeline(timelineSessions, tagMap);
+    }
+
+    private formatDateNav(date: Date): string {
+        const d = date.getDate().toString().padStart(2, '0');
+        const m = date.toLocaleString('en-US', { month: 'short' });
+        const y = date.getFullYear().toString().slice(-2);
+        return `${d}-${m}-${y}`;
     }
 
     private renderGraphs(rangeSessions: Session[], tagMap: Map<string, Tag>) {
@@ -336,6 +371,7 @@ export class StatisticsUI {
     }
 
     private renderTimeline(sessions: Session[], tagMap: Map<string, Tag>) {
+        document.getElementById('timeline-date-label')!.textContent = this.formatDateNav(this.timelineDate);
         const list = document.getElementById('timeline-list')!;
         list.innerHTML = '';
         
