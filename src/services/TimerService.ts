@@ -307,4 +307,16 @@ export class TimerService extends EventTarget {
         const todayStr = new Date().toISOString().split('T')[0];
         return sessions.filter(s => s.end.startsWith(todayStr) && !s.is_break && s.label === this.activeTag?.name).length;
     }
+
+    async getTodayCountsByTag(): Promise<Record<string, number>> {
+        const sessions = await StorageService.getSessions();
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todaySessions = sessions.filter(s => s.end.startsWith(todayStr) && !s.is_break);
+        
+        const counts: Record<string, number> = {};
+        todaySessions.forEach(s => {
+            counts[s.label] = (counts[s.label] || 0) + 1;
+        });
+        return counts;
+    }
 }

@@ -45,14 +45,30 @@ async function init() {
         statsModal.classList.add('hidden');
     });
 
+    // Close on backdrop click
+    statsModal.addEventListener('click', (e) => {
+        if (e.target === statsModal) {
+            statsModal.classList.add('hidden');
+        }
+    });
+
     // Tags Modal global close
     const tagsWrapperModal = document.getElementById('tags-wrapper-modal')!;
     const btnCloseTags = document.getElementById('btn-close-tags')!;
     btnCloseTags.addEventListener('click', () => {
         tagsWrapperModal.classList.add('hidden');
-        // Refresh Stats if open to show new/edited tags
         if (!statsModal.classList.contains('hidden')) {
             statsUI.render();
+        }
+    });
+
+    // Tags Modal backdrop click
+    tagsWrapperModal.addEventListener('click', (e) => {
+        if (e.target === tagsWrapperModal) {
+            tagsWrapperModal.classList.add('hidden');
+            if (!statsModal.classList.contains('hidden')) {
+                statsUI.render();
+            }
         }
     });
 }

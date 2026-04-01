@@ -20,7 +20,6 @@ export class TimerUI {
         this.container.innerHTML = `
             <div class="timer-container">
                 <div class="tag-badge interactive-tag" id="active-tag-badge" style="margin-bottom: 1.5rem;" title="Click to change tag (saves progress if paused)">No Tag</div>
-                <div class="session-counter" id="session-counter" style="margin-bottom: 1rem; opacity: 0.8;">Today: 0 sessions</div>
                 
                 <div class="timer-dial" id="timer-dial">
                     <div class="time-display" id="time-display">25:00</div>
@@ -131,7 +130,6 @@ export class TimerUI {
         const idleDisplay = document.getElementById('idle-display')!;
         const intDisplay = document.getElementById('interruptions-display')!;
         const intTime = document.getElementById('interruptions-time')!;
-        const sessionCounter = document.getElementById('session-counter')!;
         const btnRestart = document.getElementById('btn-restart')!;
         const btnSkipFocus = document.getElementById('btn-skip-focus')!;
 
@@ -140,16 +138,15 @@ export class TimerUI {
         
         // Update Tag and fetch session count occasionally
         if (tag) {
-            tagBadge.textContent = tag.name;
             tagBadge.style.backgroundColor = tag.color;
             if (this.lastCountTagId !== tag.id || state === 'IdleAfterFocus') {
                 this.timerService.getTodaySessionCountForTag().then(c => {
                     this.lastCountValue = c;
                     this.lastCountTagId = tag.id;
-                    sessionCounter.textContent = `Today: ${c} sessions`;
+                    tagBadge.innerHTML = `${tag.name} <span class="tag-session-count">${c}</span>`;
                 });
             } else {
-                sessionCounter.textContent = `Today: ${this.lastCountValue} sessions`;
+                tagBadge.innerHTML = `${tag.name} <span class="tag-session-count">${this.lastCountValue}</span>`;
             }
         }
 

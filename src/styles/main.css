@@ -165,6 +165,20 @@ main {
 /* Utils */
 .hidden { display: none !important; }
 
+.tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.tags-manager-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .tag-badge {
   display: flex;
   align-items: center;

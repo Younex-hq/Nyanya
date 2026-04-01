@@ -14,12 +14,21 @@ export class TagsUI {
         this.initialize();
     }
 
-    private async initialize() {
+    private initialize() {
         this.container.innerHTML = `
-            <div class="card">
-                <h2>Tags</h2>
-                <div id="tags-list" style="display:flex; flex-wrap:wrap; gap: 0.5rem; margin-bottom: 1rem;"></div>
-                <button class="btn-secondary" id="btn-add-tag">Add New Tag</button>
+            <div class="tags-manager-view">
+                <div class="tags-header" style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 id="tag-modal-title" style="font-size: 2rem; margin-bottom: 0.5rem;">Select Focus Tag</h2>
+                    <p style="opacity: 0.7; font-size: 1rem;">What are we working on today?</p>
+                </div>
+                
+                <div id="tags-list" class="tags-grid">
+                    <!-- Tags will be rendered here -->
+                </div>
+
+                <div style="display: flex; justify-content: center; margin-top: 3rem;">
+                    <button class="btn-primary" id="btn-add-tag" style="padding: 1rem 2.5rem;">+ Add New Tag</button>
+                </div>
             </div>
 
             <!-- Tag Form Modal -->
@@ -64,7 +73,7 @@ export class TagsUI {
             </div>
         `;
 
-        await this.loadTags();
+        this.loadTags();
         this.attachEvents();
     }
 
@@ -73,26 +82,30 @@ export class TagsUI {
         this.renderList();
     }
 
-    private renderList() {
+    private async renderList() {
         const list = document.getElementById('tags-list')!;
         list.innerHTML = '';
         
+        const counts = await this.timerService.getTodayCountsByTag();
+
         this.tags.forEach(tag => {
             const el = document.createElement('div');
-            el.className = 'tag-badge';
+            el.className = 'tag-badge interactive-tag';
             el.style.backgroundColor = tag.color;
             el.style.cursor = 'pointer';
-            // Determine active outline
-            el.style.backgroundColor = tag.color;
-            el.style.cursor = 'pointer';
+            
             // Determine active outline
             if (this.timerService.activeTag?.id === tag.id) {
                 el.style.border = '2px solid white';
+                el.style.boxShadow = `0 0 20px ${tag.color}80, 0 4px 12px rgba(0,0,0,0.3)`;
             }
+            
+            const count = counts[tag.name] || 0;
             el.innerHTML = `
                 <span class="tag-badge-name">${tag.name}</span>
+                <span class="tag-session-count">${count}</span>
                 ${this.isManagementMode ? `
-                <button class="btn-edit-tag" title="Edit Tag">
+                <button class="btn-edit-tag" title="Edit Tag" style="margin-left: 0.5rem;">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
