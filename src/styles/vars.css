@@ -1,35 +1,35 @@
 :root {
-  /* Material You Dark Theme Palette */
-  --sys-color-background: #1c1b1f;
-  --sys-color-on-background: #e6e1e5;
+  /* Glassmorphism Dark Theme Palette */
+  --sys-color-background: #0f172a; /* deep slate */
+  --sys-color-on-background: #f8fafc;
   
-  --sys-color-surface: #2b2930;
-  --sys-color-surface-variant: #49454f;
-  --sys-color-on-surface: #e6e1e5;
+  --sys-color-surface: rgba(30, 41, 59, 0.6);
+  --sys-color-surface-variant: rgba(51, 65, 85, 0.5);
+  --sys-color-on-surface: #f1f5f9;
   
-  --sys-color-primary: #d0bcff;
-  --sys-color-on-primary: #381e72;
-  --sys-color-primary-container: #4f378b;
-  --sys-color-on-primary-container: #eaddff;
+  --sys-color-primary: #a78bfa;
+  --sys-color-on-primary: #1e1b4b;
+  --sys-color-primary-container: rgba(139, 92, 246, 0.2);
+  --sys-color-on-primary-container: #ddd6fe;
   
-  --sys-color-secondary: #ccc2dc;
-  --sys-color-on-secondary: #332d41;
-  --sys-color-secondary-container: #4a4458;
-  --sys-color-on-secondary-container: #e8def8;
+  --sys-color-secondary: #38bdf8;
+  --sys-color-on-secondary: #082f49;
+  --sys-color-secondary-container: rgba(14, 165, 233, 0.2);
+  --sys-color-on-secondary-container: #bae6fd;
 
-  --sys-color-error: #f2b8b5;
-  --sys-color-on-error: #601410;
+  --sys-color-error: #fb7185;
+  --sys-color-on-error: #4c0519;
   
-  --sys-color-outline: #938f99;
+  --sys-color-outline: rgba(148, 163, 184, 0.2);
 
   /* Typography */
-  --font-family: 'Roboto', 'Inter', system-ui, sans-serif;
+  --font-family: 'Outfit', system-ui, sans-serif;
   
   /* Shapes */
-  --shape-small: 8px;
-  --shape-medium: 12px;
-  --shape-large: 16px;
-  --shape-extra-large: 28px;
+  --shape-small: 12px;
+  --shape-medium: 16px;
+  --shape-large: 24px;
+  --shape-extra-large: 32px;
   --shape-full: 9999px;
   
   /* Transitions */
@@ -40,9 +40,14 @@
 body {
   margin: 0;
   background-color: var(--sys-color-background);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.15), transparent 25%);
+  background-attachment: fixed;
   color: var(--sys-color-on-background);
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 
 button {

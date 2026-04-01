@@ -8,42 +8,50 @@
 
 .timer-dial {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   border-radius: 50%;
-  border: 8px solid var(--sys-color-surface-variant);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: var(--sys-color-surface);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.4), 0 10px 40px rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  transition: border-color var(--md-sys-motion-duration-medium);
+  transition: all var(--md-sys-motion-duration-medium);
 }
 
 .timer-dial.focus {
   border-color: var(--sys-color-primary);
+  box-shadow: 0 0 50px var(--sys-color-primary-container), inset 0 0 40px rgba(0,0,0,0.4);
 }
 
 .timer-dial.break {
   border-color: var(--sys-color-secondary);
+  box-shadow: 0 0 50px var(--sys-color-secondary-container), inset 0 0 40px rgba(0,0,0,0.4);
 }
 
 .timer-dial.idle {
-  border-color: var(--sys-color-error);
+  border-color: var(--sys-color-outline);
 }
 
 .time-display {
-  font-size: 5rem;
-  font-weight: 700;
+  font-size: 6rem;
+  font-weight: 300;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  text-shadow: 0 0 30px rgba(255,255,255,0.15);
 }
 
 .state-label {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 500;
   color: var(--sys-color-on-surface);
   margin-top: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
+  opacity: 0.8;
 }
 
 .timer-controls {

@@ -88,6 +88,7 @@ export class TagsUI {
                 e.stopPropagation();
                 this.timerService.setTag(tag);
                 this.renderList(); // re-render to show active
+                document.getElementById('tags-wrapper-modal')?.classList.add('hidden');
             });
             list.appendChild(el);
         });

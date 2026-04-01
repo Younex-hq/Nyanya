@@ -5,7 +5,10 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pomodoro Web App</title>
-    <meta name="theme-color" content="#1a1a1a">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./src/styles/vars.css" />
     <link rel="stylesheet" href="./src/styles/main.css" />
     <link rel="stylesheet" href="./src/styles/timer.css" />
@@ -15,18 +18,24 @@
     <div id="app">
       <header>
         <h1>Pomodoro</h1>
-        <button id="btn-stats-toggle" class="icon-button">Stats</button>
+        <button id="btn-stats-toggle" class="btn-secondary" style="border-radius: var(--shape-medium); padding: 0.5rem 1rem;">View Stats</button>
       </header>
 
       <main>
         <section id="timer-section">
           <!-- Timer UI goes here via JS -->
         </section>
-
-        <section id="tags-section">
-          <!-- Tags Manager UI goes here via JS -->
-        </section>
       </main>
+
+      <!-- Modal for tags -->
+      <div id="tags-wrapper-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+          <button id="btn-close-tags" class="close-button">&times;</button>
+          <section id="tags-section">
+            <!-- Tags Manager UI goes here via JS -->
+          </section>
+        </div>
+      </div>
       
       <!-- Modal for statistics -->
       <div id="stats-modal" class="modal hidden">

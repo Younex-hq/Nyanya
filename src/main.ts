@@ -45,6 +45,12 @@ async function init() {
         statsModal.classList.add('hidden');
     });
 
+    // Tags Modal global close
+    const tagsWrapperModal = document.getElementById('tags-wrapper-modal')!;
+    const btnCloseTags = document.getElementById('btn-close-tags')!;
+    btnCloseTags.addEventListener('click', () => {
+        tagsWrapperModal.classList.add('hidden');
+    });
 }
 
 init();

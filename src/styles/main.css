@@ -23,27 +23,31 @@ header h1 {
 }
 
 main {
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   flex: 1;
+  width: 100%;
 }
 
 /* Material You Buttons */
 .btn-primary {
-  background-color: var(--sys-color-primary-container);
+  background: linear-gradient(135deg, var(--sys-color-primary-container), var(--sys-color-primary));
   color: var(--sys-color-on-primary-container);
   padding: 1rem 2rem;
   border-radius: var(--shape-full);
   font-size: 1.1rem;
   font-weight: 500;
+  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-primary:hover {
-  background-color: var(--sys-color-primary);
+  background: linear-gradient(135deg, var(--sys-color-primary), var(--sys-color-primary-container));
   color: var(--sys-color-on-primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(208, 188, 255, 0.2);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
 .btn-secondary {
@@ -53,11 +57,14 @@ main {
   border-radius: var(--shape-full);
   font-size: 1rem;
   font-weight: 500;
+  border: 1px solid var(--sys-color-outline);
+  backdrop-filter: blur(8px);
 }
 
 .btn-secondary:hover {
   background-color: var(--sys-color-secondary-container);
   color: var(--sys-color-on-secondary-container);
+  transform: translateY(-1px);
 }
 
 .btn-icon {
@@ -81,7 +88,10 @@ main {
   background-color: var(--sys-color-surface);
   border-radius: var(--shape-extra-large);
   padding: 2rem;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  border: 1px solid var(--sys-color-outline);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Modal */
@@ -105,6 +115,8 @@ main {
 
 .modal-content {
   background-color: var(--sys-color-background);
+  background-image: radial-gradient(circle at top right, rgba(139, 92, 246, 0.1), transparent 40%);
+  border: 1px solid var(--sys-color-outline);
   border-radius: var(--shape-extra-large);
   padding: 2rem;
   width: 90%;
@@ -112,7 +124,8 @@ main {
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+  backdrop-filter: blur(16px);
 }
 
 .close-button {
@@ -148,7 +161,8 @@ main {
 .hidden { display: none !important; }
 
 @media (max-width: 768px) {
-  main {
-    grid-template-columns: 1fr;
+  .modal-content {
+    width: 95%;
+    padding: 1.5rem;
   }
 }

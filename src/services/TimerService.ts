@@ -76,7 +76,6 @@ export class TimerService extends EventTarget {
             this.state = 'Break';
             
             // Determine if long or short break
-            this.sessionCount++;
             if (this.sessionCount >= this.activeTag.sessionsBeforeLongBreak) {
                 this.targetDurationMinutes = this.activeTag.longBreakTime;
                 this.sessionCount = 0; // reset
@@ -106,6 +105,18 @@ export class TimerService extends EventTarget {
                     }
                 }
             });
+            this.idleSeconds = 0;
+            this.notify();
+        }
+    }
+
+    skipBreak() {
+        if (this.state === 'Break' || this.state === 'BreakPaused') {
+            this.stopTicker();
+            this.stopPausingTicker();
+            this.state = 'Idle';
+            this.timeRemainingSeconds = this.activeTag ? this.activeTag.focusTime * 60 : 25 * 60;
+            this.interruptionSeconds = 0;
             this.idleSeconds = 0;
             this.notify();
         }
@@ -189,6 +200,7 @@ export class TimerService extends EventTarget {
         this.currentSessionNotes = '';
 
         if (wasFocus) {
+            this.sessionCount++;
             this.state = 'IdleAfterFocus';
             this.startTicker(); // Start counting idle UP
         } else {
@@ -201,5 +213,12 @@ export class TimerService extends EventTarget {
 
     private notify() {
         this.dispatchEvent(new Event('change'));
+    }
+
+    async getTodaySessionCountForTag(): Promise<number> {
+        if (!this.activeTag) return 0;
+        const sessions = await StorageService.getSessions();
+        const todayStr = new Date().toISOString().split('T')[0];
+        return sessions.filter(s => s.end.startsWith(todayStr) && !s.is_break && s.label === this.activeTag?.name).length;
     }
 }

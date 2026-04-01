@@ -60,4 +60,19 @@ export class StatisticsHelpers {
             label: map[i]?.label || ''
         }));
     }
+
+    static formatDecimalMinutesToHHMMSS(decimalMinutes: number): string {
+        const totalSeconds = Math.floor(decimalMinutes * 60);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        const mStr = minutes.toString().padStart(2, '0');
+        const sStr = seconds.toString().padStart(2, '0');
+        
+        if (hours > 0) {
+            return `${hours.toString().padStart(2, '0')}:${mStr}:${sStr}`;
+        }
+        return `${mStr}:${sStr}`;
+    }
 }

@@ -87,4 +87,18 @@ export class StorageService {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
+
+    static async importData(jsonData: string): Promise<void> {
+        try {
+            const data = JSON.parse(jsonData);
+            if (Array.isArray(data)) {
+                // Ensure some basic validation
+                const validSessions = data.filter(s => s.end && s.label && typeof s.duration === 'number');
+                await db.sessions.bulkAdd(validSessions);
+            }
+        } catch (e) {
+            console.error('Failed to import data:', e);
+            throw e;
+        }
+    }
 }
