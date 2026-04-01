@@ -16,13 +16,11 @@ export class StatisticsUI {
     private initialize() {
         this.container.innerHTML = `
             <div class="stats-dashboard">
-                <div style="display: flex; justify-content: flex-end; align-items: center;">
-                    <select id="stat-range-select" class="input-field" style="width: auto; padding: 0.5rem; margin: 0;">
-                        <option value="today">Today</option>
-                        <option value="week">Week</option>
-                        <option value="month">Month</option>
-                        <option value="total" selected>Total</option>
-                    </select>
+                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem;">
+                    <button class="btn-secondary" id="btn-clear-data" style="padding: 0.5rem 1rem; font-size: 0.9rem; border-color: rgba(242, 184, 181, 0.4); color: #f2b8b5;">Clear All Data</button>
+                    <button class="btn-secondary" id="btn-export-json" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Export JSON</button>
+                    <button class="btn-secondary" id="btn-import-json" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Import JSON</button>
+                    <input type="file" id="input-import-json" accept=".json" class="hidden" />
                 </div>
                 
                 <div class="stats-grid">
@@ -34,9 +32,16 @@ export class StatisticsUI {
                     </div>
                     
                     <div class="stat-card minimal-card">
-                        <h3>Selected Range</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3>Selected Range</h3>
+                            <select id="stat-range-select" class="input-field" style="width: auto; padding: 0.25rem; margin: 0; font-size: 0.8rem;">
+                                <option value="today">Today</option>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                                <option value="total" selected>Total</option>
+                            </select>
+                        </div>
                         <div class="stat-row"><span>Focus</span> <strong id="stat-range-focus">00:00</strong></div>
-                        <div class="stat-row" style="visibility: hidden;"><span>Placeholder</span> <strong>00:00</strong></div>
                         <div class="stat-row" style="visibility: hidden;"><span>Placeholder</span> <strong>00:00</strong></div>
                     </div>
                 </div>
@@ -44,14 +49,14 @@ export class StatisticsUI {
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h3>Distribution</h3>
-                        <div style="max-width: 200px; margin: 0 auto;">
+                        <div style="max-width: 320px; width: 100%; margin: 0 auto;">
                             <canvas id="chart-ring"></canvas>
                         </div>
                     </div>
 
                     <div class="stat-card">
                         <h3>Focus vs Interruptions</h3>
-                        <div style="width: 100%; height: 200px;">
+                        <div style="width: 100%; height: 260px;">
                             <canvas id="chart-line"></canvas>
                         </div>
                     </div>
@@ -60,24 +65,40 @@ export class StatisticsUI {
                 <div class="stat-card heatmap-container">
                     <h3>Productive Hours (Today)</h3>
                     <div id="heatmap-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
-                        <div class="heatmap-grid" id="heatmap-hours" style="grid-template-rows: repeat(1, 1fr); height: 30px;">
+                        <div class="heatmap-grid daily-heatmap" id="heatmap-hours">
                             <!-- 24 cells for hours -->
                         </div>
-                        <div class="heatmap-labels" id="heatmap-labels" style="display: grid; grid-auto-columns: 14px; grid-auto-flow: column; gap: 4px; font-size: 0.6rem; text-align: center; opacity: 0.6;">
+                        <div class="heatmap-labels daily-labels" id="heatmap-labels">
                             <!-- labels -->
                         </div>
                     </div>
                 </div>
 
-                <div class="stat-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="margin: 0;">Timeline</h3>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn-secondary" id="btn-export-json" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Export JSON</button>
-                            <button class="btn-secondary" id="btn-import-json" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Import JSON</button>
-                            <input type="file" id="input-import-json" accept=".json" class="hidden" />
+                <div class="stat-card heatmap-container">
+                    <h3>Yearly Focus Activity</h3>
+                    <div class="heatmap-wrapper" style="overflow-x: auto; display: flex; gap: 0.5rem; padding: 0.5rem 0;">
+                        <div class="heatmap-day-labels" style="display: grid; grid-template-rows: repeat(7, 12px); gap: 3px; font-size: 0.65rem; opacity: 0.6; padding-top: 1.25rem;">
+                            <div></div> <!-- Sun -->
+                            <div>Mon</div>
+                            <div></div> <!-- Tue -->
+                            <div>Wed</div>
+                            <div></div> <!-- Thu -->
+                            <div>Fri</div>
+                            <div></div> <!-- Sat -->
+                        </div>
+                        <div style="flex: 1;">
+                            <div id="heatmap-month-labels" style="display: grid; grid-auto-columns: 12px; grid-auto-flow: column; gap: 3px; font-size: 0.65rem; opacity: 0.6; height: 1.25rem; align-items: end;">
+                                <!-- months -->
+                            </div>
+                            <div class="yearly-heatmap-grid" id="heatmap-yearly" style="padding: 0;">
+                                <!-- 7x53 cells -->
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3 style="margin-bottom: 1rem;">Timeline</h3>
                     <div id="timeline-list" class="timeline-list">
                         <!-- timeline items -->
                     </div>
@@ -114,6 +135,13 @@ export class StatisticsUI {
             }
         });
 
+        document.getElementById('btn-clear-data')!.addEventListener('click', async () => {
+            if (window.confirm('Are you sure you want to clear all session data? This cannot be undone.')) {
+                await StorageService.clearSessions();
+                this.render();
+            }
+        });
+
         document.getElementById('stat-range-select')!.addEventListener('change', () => {
             this.render();
         });
@@ -136,6 +164,7 @@ export class StatisticsUI {
 
         this.renderGraphs(rangeSessions, tagMap);
         this.renderProductiveHours(sessions, tagMap);
+        this.renderYearlyHeatmap(sessions);
         this.renderTimeline(rangeSessions.filter(s => !s.is_break), tagMap);
     }
 
@@ -197,7 +226,15 @@ export class StatisticsUI {
                 responsive: true, maintainAspectRatio: false,
                 scales: { 
                     x: { ticks: { color: '#e6e1e5' } }, 
-                    y: { ticks: { color: '#e6e1e5' } } 
+                    y: { 
+                        ticks: { 
+                            color: '#e6e1e5',
+                            stepSize: 30,
+                            callback: (value: any) => {
+                                return `${(value / 60).toFixed(1)} h`;
+                            }
+                        } 
+                    } 
                 },
                 plugins: { 
                     legend: { labels: { color: '#e6e1e5' } },
@@ -246,6 +283,58 @@ export class StatisticsUI {
         });
     }
 
+    private renderYearlyHeatmap(sessions: Session[]) {
+        const gridEl = document.getElementById('heatmap-yearly')!;
+        const monthEl = document.getElementById('heatmap-month-labels')!;
+        gridEl.innerHTML = '';
+        monthEl.innerHTML = '';
+        
+        const yearlyData = StatisticsHelpers.getYearlyFocusData(sessions);
+        
+        const now = new Date();
+        const daysToShow = 53 * 7;
+        const lastYearStart = new Date(now);
+        lastYearStart.setDate(now.getDate() - daysToShow + 1);
+        
+        // Intensity mapping
+        const maxFocus = Math.max(...Object.values(yearlyData), 1, 60);
+
+        let currentMonth = -1;
+        
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        for (let i = 0; i < daysToShow; i++) {
+            const date = new Date(lastYearStart);
+            date.setDate(lastYearStart.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            const duration = yearlyData[dateStr] || 0;
+
+            // Month labels (only on the first day of the week column)
+            if (i % 7 === 0) {
+                const monthLabel = document.createElement('div');
+                const m = date.getMonth();
+                if (m !== currentMonth) {
+                    monthLabel.textContent = months[m];
+                    currentMonth = m;
+                }
+                monthLabel.style.width = '12px';
+                monthEl.appendChild(monthLabel);
+            }
+            
+            const cell = document.createElement('div');
+            cell.className = 'heatmap-cell yearly-cell';
+            cell.title = `${dateStr}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(duration)}`;
+            
+            if (duration > 0) {
+                const intensity = Math.min(Math.ceil((duration / maxFocus) * 4), 4);
+                cell.setAttribute('data-intensity', intensity.toString());
+            } else {
+                cell.setAttribute('data-intensity', '0');
+            }
+            gridEl.appendChild(cell);
+        }
+    }
+
     private renderTimeline(sessions: Session[], tagMap: Map<string, Tag>) {
         const list = document.getElementById('timeline-list')!;
         list.innerHTML = '';
@@ -259,19 +348,23 @@ export class StatisticsUI {
             const tStr = dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
             const el = document.createElement('div');
-            el.className = 'timeline-item';
+            el.className = 'timeline-item redesigned-item';
             
             const color = tagMap.get(s.label)?.color || '#ccc';
 
             el.innerHTML = `
-                <div>
-                    <strong>${s.is_break ? 'Break' : 'Focus'}</strong> 
-                    <span style="color: ${color}">[${s.label}]</span>
-                    ${s.notes ? `<div><small>${s.notes}</small></div>` : ''}
+                <div class="tl-left">
+                    <small>${dStr}</small>
+                    <div class="tl-time">${tStr}</div>
                 </div>
-                <div style="text-align: right;">
-                    <div style="font-weight: 500;">${StatisticsHelpers.formatDecimalMinutesToHHMMSS(s.duration)}</div>
-                    <small style="opacity: 0.6;">${dStr} ${tStr}</small>
+                <div class="tl-content">
+                    <div class="tl-tag" style="background-color: ${color}22; color: ${color}; border-color: ${color}44;">
+                        ${s.label}
+                    </div>
+                    ${s.notes ? `<div class="tl-notes">${s.notes}</div>` : ''}
+                </div>
+                <div class="tl-right">
+                    <div class="tl-duration">${StatisticsHelpers.formatDecimalMinutesToHHMMSS(s.duration)}</div>
                 </div>
             `;
             list.appendChild(el);

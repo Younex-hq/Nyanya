@@ -75,4 +75,14 @@ export class StatisticsHelpers {
         }
         return `${mStr}:${sStr}`;
     }
+
+    static getYearlyFocusData(sessions: Session[]): Record<string, number> {
+        const data: Record<string, number> = {};
+        for (const s of sessions) {
+            if (s.is_break) continue;
+            const dateStr = s.end.split('T')[0];
+            data[dateStr] = (data[dateStr] || 0) + s.duration;
+        }
+        return data;
+    }
 }

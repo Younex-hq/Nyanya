@@ -101,4 +101,8 @@ export class StorageService {
             throw e;
         }
     }
+
+    static async clearSessions(): Promise<void> {
+        await db.sessions.clear();
+    }
 }
