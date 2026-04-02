@@ -664,13 +664,11 @@ export class StatisticsUI {
                 cell.title = `${dateStr}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(duration)}`;
 
                 if (duration > 0) {
-                    const intensity = Math.min(
-                        Math.ceil((duration / maxFocus) * 4),
-                        4,
-                    );
-                    cell.setAttribute("data-intensity", intensity.toString());
+                    const opacity = Math.max(0.5, duration / maxFocus); // Ensure minimum opacity of 0.5
+                    cell.style.backgroundColor = `var(--sys-color-primary)`;
+                    cell.style.opacity = opacity.toString();
                 } else {
-                    cell.setAttribute("data-intensity", "0");
+                    cell.style.opacity = "0.5"; // Default opacity for days with no focus
                 }
             }
             gridEl.appendChild(cell);

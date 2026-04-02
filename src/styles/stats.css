@@ -152,12 +152,7 @@
   height: 12px;
 }
 
-/* Intensity colors for Yearly Heatmap */
-.heatmap-cell[data-intensity="0"] { background-color: #1a1a1f; }
-.heatmap-cell[data-intensity="1"] { background-color: color-mix(in srgb, var(--sys-color-primary), transparent 80%); }
-.heatmap-cell[data-intensity="2"] { background-color: color-mix(in srgb, var(--sys-color-primary), transparent 60%); }
-.heatmap-cell[data-intensity="3"] { background-color: color-mix(in srgb, var(--sys-color-primary), transparent 30%); }
-.heatmap-cell[data-intensity="4"] { background-color: var(--sys-color-primary); }
+
 
 .timeline-list {
   display: flex;
