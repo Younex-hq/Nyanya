@@ -10,6 +10,7 @@ export class StatisticsUI {
     private ringChartInstance: Chart | null = null;
     private lineChartInstance: Chart | null = null;
     private timelineDate: Date = new Date();
+    private selectedTag: string | null = null;
 
     constructor(container: HTMLElement, tagsUI: TagsUI) {
         this.container = container;
@@ -184,10 +185,19 @@ export class StatisticsUI {
             });
     }
 
+    private updateDynamicTheme(color: string) {
+        const root = document.documentElement;
+        root.style.setProperty('--sys-color-primary', color);
+    }
+
     public async render() {
-        const sessions = await StorageService.getSessions();
+        let sessions = await StorageService.getSessions();
         const tags = await StorageService.getTags();
         const tagMap = new Map(tags.map((t) => [t.name, t]));
+
+        if (this.selectedTag) {
+            sessions = sessions.filter(s => s.label === this.selectedTag);
+        }
 
         const todaySessions = StatisticsHelpers.getTodaySessions(sessions);
 
@@ -229,6 +239,15 @@ export class StatisticsUI {
         this.renderTimelineOnly();
         this.renderYearlyHeatmap(sessions);
         this.renderTagLegend(tags);
+
+        if (this.selectedTag) {
+            const selectedTagObj = tags.find(t => t.name === this.selectedTag);
+            if (selectedTagObj) {
+                this.updateDynamicTheme(selectedTagObj.color);
+            }
+        } else {
+            this.updateDynamicTheme('#d0bcff'); // Default color
+        }
     }
 
     private renderTagLegend(tags: Tag[]) {
@@ -238,10 +257,31 @@ export class StatisticsUI {
         tags.forEach((tag) => {
             const pill = document.createElement("div");
             pill.className = "tag-pill";
+            if (this.selectedTag && this.selectedTag !== tag.name) {
+                pill.style.opacity = "0.4";
+            }
+            if (this.selectedTag === tag.name) {
+                pill.style.border = `1px solid ${tag.color}`;
+                pill.style.backgroundColor = `${tag.color}22`;
+            }
+            
             pill.innerHTML = `
                 <span class="tag-dot" style="background-color: ${tag.color}"></span>
                 <span class="tag-name">${tag.name}</span>
             `;
+            
+            pill.addEventListener("click", () => {
+                if (this.selectedTag === tag.name) {
+                    this.selectedTag = null;
+                } else {
+                    this.selectedTag = tag.name;
+                }
+                this.render();
+            });
+            
+            // Add cursor pointer for better UX
+            pill.style.cursor = "pointer";
+            
             legend.appendChild(pill);
         });
 
@@ -268,9 +308,13 @@ export class StatisticsUI {
     }
 
     private async renderTimelineOnly() {
-        const sessions = await StorageService.getSessions();
+        let sessions = await StorageService.getSessions();
         const tags = await StorageService.getTags();
         const tagMap = new Map(tags.map((t) => [t.name, t]));
+
+        if (this.selectedTag) {
+            sessions = sessions.filter(s => s.label === this.selectedTag);
+        }
 
         const dateStr = this.timelineDate.toISOString().split("T")[0];
         const timelineSessions = sessions.filter(
