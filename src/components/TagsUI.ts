@@ -102,7 +102,7 @@ export class TagsUI {
                             </div>
 
                             <div style="display:flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
-                                <button type="submit" class="btn-primary" style="width: 100%; padding: 1.25rem;">Save Categorization</button>
+                                <button type="submit" class="btn-primary" style="width: 100%; padding: 1.25rem;">Save</button>
                                 <button type="button" id="btn-delete-tag" class="btn-secondary danger-button hidden" style="width: 100%; border: none; background: rgba(255,0,0,0.1); color: #ff5555;">Discard Tag</button>
                             </div>
                         </form>
