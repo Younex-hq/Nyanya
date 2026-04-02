@@ -85,7 +85,7 @@ export class TimerUI {
             const state = this.timerService.getState();
             if (state !== 'Idle' && state !== 'IdleAfterFocus' && state !== 'FocusPaused') return;
             this.tagsUI.setManagementMode(false);
-            document.getElementById('tags-wrapper-modal')!.classList.remove('hidden');
+            location.hash = 'tags';
         });
 
         const btnRestart = document.getElementById('btn-restart')!;

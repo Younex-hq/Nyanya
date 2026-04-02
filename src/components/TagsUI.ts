@@ -196,9 +196,7 @@ export class TagsUI {
                 } else {
                     this.timerService.setTag(tag);
                     this.renderList(); // re-render to show active
-                    document
-                        .getElementById("tags-wrapper-modal")
-                        ?.classList.add("hidden");
+                    history.back();
                 }
             });
 
@@ -247,9 +245,6 @@ export class TagsUI {
         addEl.addEventListener("click", () => {
             const form = document.getElementById("tag-form") as HTMLFormElement;
             const modal = document.getElementById("tag-modal")!;
-            document
-                .getElementById("tags-wrapper-modal")
-                ?.classList.add("hidden");
             form.reset();
             const nameInput = document.getElementById("tag-name") as HTMLInputElement;
             nameInput.disabled = false;
@@ -259,7 +254,7 @@ export class TagsUI {
                 "Create Tag";
             document.getElementById("btn-delete-tag")!.classList.add("hidden");
             this.updatePreview();
-            modal.classList.remove("hidden");
+            location.hash = 'forge';
         });
     }
 
@@ -279,11 +274,13 @@ export class TagsUI {
         colorInput.addEventListener("input", () => this.updatePreview());
 
         btnClose.addEventListener("click", () => {
-            modal.classList.add("hidden");
-            if (this.isManagementMode) {
-                document
-                    .getElementById("tags-wrapper-modal")
-                    ?.classList.remove("hidden");
+            history.back();
+        });
+
+        // Optional: add a backdrop click handler to tag-modal for consistency
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                history.back();
             }
         });
 
@@ -307,12 +304,7 @@ export class TagsUI {
                 }
 
                 await this.loadTags();
-                modal.classList.add("hidden");
-                if (this.isManagementMode) {
-                    document
-                        .getElementById("tags-wrapper-modal")
-                        ?.classList.remove("hidden");
-                }
+                history.back();
             }
         });
 
@@ -355,18 +347,13 @@ export class TagsUI {
 
             await StorageService.saveTag(newTag);
             await this.loadTags();
-            modal.classList.add("hidden");
-
-            if (this.isManagementMode) {
-                document
-                    .getElementById("tags-wrapper-modal")
-                    ?.classList.remove("hidden");
-            }
 
             // if it was the active tag, update service
             if (this.timerService.activeTag?.id === newTag.id) {
                 this.timerService.setTag(newTag);
             }
+            
+            history.back();
         });
 
         this.timerService.addEventListener("change", () => {

@@ -324,9 +324,7 @@ export class StatisticsUI {
         `;
         editPills.addEventListener("click", () => {
             this.tagsUI.setManagementMode(true);
-            document
-                .getElementById("tags-wrapper-modal")
-                ?.classList.remove("hidden");
+            location.hash = 'tags';
         });
         legend.appendChild(editPills);
     }

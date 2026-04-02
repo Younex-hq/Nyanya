@@ -37,18 +37,17 @@ async function init() {
     const btnCloseStats = document.getElementById('btn-close-stats')!;
 
     btnStatsToggle.addEventListener('click', () => {
-        statsModal.classList.remove('hidden');
-        statsUI.render();
+        location.hash = 'stats';
     });
 
     btnCloseStats.addEventListener('click', () => {
-        statsModal.classList.add('hidden');
+        history.back();
     });
 
     // Close on backdrop click
     statsModal.addEventListener('click', (e) => {
         if (e.target === statsModal) {
-            statsModal.classList.add('hidden');
+            history.back();
         }
     });
 
@@ -56,21 +55,41 @@ async function init() {
     const tagsWrapperModal = document.getElementById('tags-wrapper-modal')!;
     const btnCloseTags = document.getElementById('btn-close-tags')!;
     btnCloseTags.addEventListener('click', () => {
-        tagsWrapperModal.classList.add('hidden');
-        if (!statsModal.classList.contains('hidden')) {
-            statsUI.render();
-        }
+        history.back();
     });
 
     // Tags Modal backdrop click
     tagsWrapperModal.addEventListener('click', (e) => {
         if (e.target === tagsWrapperModal) {
-            tagsWrapperModal.classList.add('hidden');
-            if (!statsModal.classList.contains('hidden')) {
-                statsUI.render();
-            }
+            history.back();
         }
     });
+
+    // Hash Router for Modals
+    window.addEventListener('hashchange', () => {
+        const hash = location.hash.replace('#', '');
+        const tagModal = document.getElementById('tag-modal'); // Might be created by TagsUI
+        
+        // Hide all first
+        statsModal.classList.add('hidden');
+        tagsWrapperModal.classList.add('hidden');
+        if (tagModal) tagModal.classList.add('hidden');
+        
+        // Show specific modal based on hash
+        if (hash === 'stats') {
+            statsModal.classList.remove('hidden');
+            statsUI.render();
+        } else if (hash === 'tags') {
+            tagsWrapperModal.classList.remove('hidden');
+        } else if (hash === 'forge') {
+            if (tagModal) tagModal.classList.remove('hidden');
+        }
+    });
+
+    // Initialize hash state if the user loaded the page with a hash
+    if (location.hash) {
+        window.dispatchEvent(new Event('hashchange'));
+    }
 }
 
 init();
