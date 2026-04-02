@@ -346,6 +346,10 @@ export class StatisticsUI {
     }
 
     private renderGraphs(rangeSessions: Session[], tagMap: Map<string, Tag>) {
+        const rangeStr = (
+            document.getElementById("stat-range-select") as HTMLSelectElement
+        ).value as any;
+
         const focusSessions = rangeSessions.filter((s) => !s.is_break);
 
         // Ring Graph
@@ -392,9 +396,32 @@ export class StatisticsUI {
         ) as HTMLCanvasElement;
         if (this.lineChartInstance) this.lineChartInstance.destroy();
 
-        const daysRaw = [
-            ...new Set(rangeSessions.map((s) => s.end.split("T")[0])),
-        ].sort();
+        // Generate full list of days for the range
+        let daysRaw: string[] = [];
+        const now = new Date();
+        const todayStr = now.toISOString().split("T")[0];
+
+        if (rangeStr === "today") {
+            daysRaw = [todayStr];
+        } else if (rangeStr === "week") {
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(now.getDate() - i);
+                daysRaw.push(d.toISOString().split("T")[0]);
+            }
+        } else if (rangeStr === "month") {
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(now.getDate() - i);
+                daysRaw.push(d.toISOString().split("T")[0]);
+            }
+        } else {
+            // Total - only show days with data
+            daysRaw = [
+                ...new Set(rangeSessions.map((s) => s.end.split("T")[0])),
+            ].sort();
+        }
+
         const focusData = daysRaw.map((d) =>
             rangeSessions
                 .filter((s) => s.end.startsWith(d) && !s.is_break)
@@ -408,10 +435,21 @@ export class StatisticsUI {
 
         // Dynamic width calculation
         const container = document.getElementById("chart-line-container")!;
-        const minWidthPerDay = 60; // Adjust as needed
+        const minWidthPerDay = 80; 
         const totalDays = daysRaw.length;
-        const calculatedWidth = Math.max(100, totalDays * minWidthPerDay);
-        container.style.width = totalDays > 7 ? `${calculatedWidth}px` : "100%";
+        
+        // If week or today, 100% width. If month or total > 7, scrollable.
+        if (totalDays <= 7) {
+            container.style.width = "100%";
+        } else {
+            container.style.width = `${totalDays * minWidthPerDay}px`;
+        }
+
+        const defaultColor = "rgb(189, 226, 255)";
+        let focusBarColor = defaultColor;
+        if (this.selectedTag) {
+            focusBarColor = tagMap.get(this.selectedTag)?.color || defaultColor;
+        }
 
         this.lineChartInstance = new Chart(lineCtx, {
             type: "bar",
@@ -421,7 +459,7 @@ export class StatisticsUI {
                     {
                         label: "Focus",
                         data: focusData,
-                        backgroundColor: "rgb(189, 226, 255)",
+                        backgroundColor: focusBarColor,
                     },
                     {
                         label: "Interruptions",
