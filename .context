@@ -1,0 +1,94 @@
+This is a Pomodoro web application. that will be hosted on Github Pages, to run locally, the DB is IndexedDB, and you can download/upload the time line as JSON
+
+Project File Structure:
+
+.:
+dist        node_modules  pnpm-lock.yaml  src            vite.config.ts
+index.html  package.json  public          tsconfig.json
+
+./dist:
+assets       icons.svg   manifest.webmanifest  workbox-3105ea8d.js
+favicon.svg  index.html  sw.js
+
+./dist/assets:
+index-L7HCMUDn.js  index-bUNfIMSK.css  workbox-window.prod.es5-Bq4GJJid.js
+
+./node_modules:
+chart.js  dexie  typescript  vite  vite-plugin-pwa  workbox-window
+
+./public:
+favicon.svg  icons.svg
+
+./src:
+assets      counter.ts  models    style.css  utils
+components  main.ts     services  styles     vite-env.d.ts
+
+./src/assets:
+hero.png  typescript.svg  vite.svg
+
+./src/components:
+StatisticsUI.ts  TagsUI.ts  TimerUI.ts
+
+./src/models:
+types.ts
+
+./src/services:
+StorageService.ts  TimerService.ts
+
+./src/styles:
+main.css  stats.css  timer.css  vars.css
+
+./src/utils:
+StatisticsHelpers.ts
+
+File Descriptions:
+
+- src/main.ts: This is the entry point of the application. It initializes the StorageService, requests notification permissions, sets up the TimerService, and instantiates the UI components (TagsUI, TimerUI, StatisticsUI). It also handles modal interactions for statistics and tag management.
+- src/services/StorageService.ts: Manages data persistence using IndexedDB (Dexie.js). It handles operations for tags and sessions, including initialization with default tags, saving, retrieving, updating, and deleting. It also provides functionality to export and import session data as JSON.
+- src/services/TimerService.ts: Manages the core logic of the Pomodoro timer. It handles the timer's state (Idle, Focus, Break, Paused), active tag management, session duration, interruptions, and notifications. It dispatches 'change' events to notify UI components of state changes.
+- src/components/TimerUI.ts: Responsible for rendering the main timer interface. It displays the active tag, time remaining, current state, and controls for starting, pausing, restarting, and skipping focus/break sessions. It also handles dynamic theme updates based on the active tag's color.
+- src/components/TagsUI.ts: Manages the display and interaction of tags. It renders a list of tags, allows users to select an active tag for the timer, and provides an interface for managing (adding, editing, deleting) tags through a "Tag Forge" modal. It also displays session counts for each tag.
+- src/components/StatisticsUI.ts: Renders the statistics dashboard. It displays various metrics such as today's focus/break/interruptions, historical analysis by range (today, week, month, total), distribution of focus time by tag (ring chart), focus vs. interruptions over time (bar chart), productive hours heatmap, yearly focus activity heatmap, and a session timeline. It also includes functionality for clearing, exporting, and importing data. This component now supports filtering statistics by a selected tag.
+- src/utils/StatisticsHelpers.ts: Provides utility functions for calculating and formatting statistics from session data. This includes functions to get today's sessions, calculate focus/break/interruption times, filter sessions by date range, group sessions by day and tag, generate productive hours vectors, format time, and get yearly focus data.
+- src/models/types.ts: Defines TypeScript interfaces for the core data structures used in the application: `Session` (representing a completed Pomodoro session), `Tag` (representing a user-defined tag with its settings), and `TimerState` (an enum-like type for the timer's various states).
+- src/styles/stats.css: Contains the CSS styles specifically for the statistics dashboard, including layout, card styling, heatmap visuals, and timeline item presentation.
+
+
+Recent changes:
+- Implemented tag filtering in StatisticsUI.ts: Users can now click on tags in the statistics view to filter all displayed data (Today's Overview, Productive Hours, Range Analysis, Charts, Timeline, and Yearly Activity) by the selected tag.
+- Added visual feedback for selected tags: Selected tags are highlighted with a border and background, while unselected tags are dimmed.
+- Added deselection functionality: Clicking an already selected tag will deselect it and show all statistics.
+- Implemented dynamic color theming in StatisticsUI.ts: The statistics dashboard now dynamically updates its primary color (`--sys-color-primary`) to match the color of the currently selected tag. If no tag is selected, a default color is used. This affects various elements like headings, strong text, and heatmap intensity.
+- Redesigned "Select a Tag" card in TagsUI.ts: Modernized the tag selection layout by implementing a responsive grid of tag cards, integrating the "Add New Tag" button directly into the grid as a styled placeholder card, and updating the UI header with an icon and clear typography for a more organized and cleaner appearance.
+- Modernized and Compacted Timeline in StatisticsUI.ts: Seamlessly integrated the daily "Productive Hours" heatmap and "Total Focus" time directly into the Timeline card. Renamed the heatmap section to "Productive Hours" and moved the focus duration to the top right corner for a cleaner, more professional look. Fixed a bug where the timeline heatmap would only show data for the current day regardless of the selected date.
+- Updated default theme color: The default primary theme color of the application has been changed to RGB(189, 226, 255) for a refreshed visual appearance. All graphs and heatmaps now utilize this new default color when no specific tag is selected.
+- Enhanced "Focus vs Interruptions" Graph: The bar chart now correctly filters based on the selected range (Today, Week, Month, Total) and dynamically updates its "Focus" dataset color when a specific tag is selected in the Statistics view. For the "Week" and "Month" views, it now generates a full list of days (even those without sessions) to provide a consistent visual representation. The chart features a scrollable horizontal layout (80px per day) when displaying more than 7 days, ensuring readability across longer timeframes.
+- Set "Pomodoro" as the single default tag: New users will now find a single default tag named "Pomodoro" with standard Pomodoro times (25m focus, 5m break, 15m long break) and the new theme color.
+- Implemented Full Data Export/Import: Updated `StorageService.ts` to export both sessions (timeline) and tags (with their colors and settings) into a single JSON object. The import process now handles this new format, allowing users to restore their entire application state, including custom tags, while maintaining backward compatibility for old session-only exports.
+- Factory Reset Functionality: Updated the "Clear All Data" action to completely reset the application. It now clears both the session history and all custom tags, then re-initializes the single default "Pomodoro" tag, making the app "brand new" for the user.
+- Mobile Responsiveness & UI Polish: Massively improved the mobile experience across the entire app. Refactored the Statistics dashboard to stack horizontally overflowing charts vertically, modernized the mobile timeline cards, and completely rebuilt the "Tag Forge" (edit/create tag) and "Select a Tag" modals to use responsive CSS grids.
+- Native Mobile Navigation (Hash Routing): Replaced manual CSS class toggling for modals with a robust URL Hash Routing system (`#stats`, `#tags`, `#forge`). This allows users on mobile devices to use their physical or gesture "Back" button to seamlessly close modals (Statistics, Tag selector) without exiting the entire web app.
+- Protected Default Tag: The core "Pomodoro" tag is now hardcoded as a protected entity. It cannot be renamed or deleted from the Tag Forge, and the data import logic guarantees it is always restored or merged properly, ensuring the app always has a baseline fallback tag.
+- Non-Destructive Data Imports: Overhauled the JSON import logic in `StorageService.ts`. Instead of wiping the database, importing a JSON file now intelligently merges tags (updating existing ones and adding new ones) and handles session conflicts by prioritizing the imported session data over the local data based on the `end` timestamp.
+- Enhanced Timer Controls: Added a prominent "Cancel Session" (✕) button when a timer is paused, allowing users to quickly abort a session without saving it. Rearranged the paused timer buttons to keep the primary "Resume" action centered.
+- Eliminated UI Flickering: Fixed a performance and visual bug where the "Select a Tag" modal would re-render its DOM every second while the timer was ticking. The list now only re-renders when the timer state genuinely changes (e.g., finishing a session) or when the modal is actually visible.
+- Timeline Navigation Constraint: Added logic to the Statistics Timeline to disable the "Next" day button when viewing today's sessions, preventing users from navigating into the future. Removed redundant date text from individual timeline cards for a cleaner look.
+- Yearly Focus Activity Enhancements: Added sticky day labels (Mon, Wed, Fri) that remain visible during horizontal scrolling on mobile. Implemented a year navigation toggle (Previous/Next) with smart limits to prevent future navigation.
+- Responsive Statistics Headers: Introduced a flexible `.stat-card-header` to ensure that long titles and navigation controls (like the year picker) stack vertically and center themselves on small mobile screens, preventing horizontal layout breaks.
+- Updated "Yearly Focus Activity" heatmap: Days with more focus have higher opacity, and days with less focus have lower opacity, with a minimum opacity of 50%. Removed `data-intensity` CSS rules.
+- Added color picker with predefined HSL colors to the Tag Forge in `src/components/TagsUI.ts`.
+- Fixed shrinking "tag-forge-preview-area" in `src/components/TagsUI.ts`.
+- Redesigned "edit tag card" (Tag Forge) to match the application's modern aesthetic in `src/components/TagsUI.ts`.
+- Compacted the Tag Forge modal to eliminate scrolling and redesigned the Save and Discard buttons in `src/components/TagsUI.ts`.
+- Fixed "Interruptions" time format to hh:mm:ss in `src/components/StatisticsUI.ts` and `src/components/TimerUI.ts`.
+- Renamed "Idle" to "Additional Time" and redesigned its UI in `src/components/TimerUI.ts`.
+- Updated favicon to a tomato icon in `public/favicon.svg` and linked it correctly in `index.html`.
+- Fixed statistics theme override while timer is running: `TimerUI.ts` now avoids overriding global theme colors when `#stats` is open, so selected stats tag color remains stable.
+- Optimized timer engine in `src/services/TimerService.ts`: uses elapsed-time deltas (`Date.now`) and adaptive tick intervals (1s visible, 5s hidden) for better background efficiency and lower CPU wakeups.
+- Optimized timer rendering in `src/components/TimerUI.ts`: reduced repeated DOM writes for tag badge and reduced unnecessary session-count fetch calls.
+- Optimized tag modal updates in `src/components/TagsUI.ts`: re-renders tag list only on meaningful state/tag changes while modal is visible.
+- Deep-optimized statistics rendering in `src/components/StatisticsUI.ts`:
+  - Added in-memory caching of sessions/tags during render cycles to reduce IndexedDB reads.
+  - Reused existing Chart.js instances (ring/bar) and updated datasets instead of destroy/recreate each render.
+  - Added theme update guard to avoid redundant CSS variable writes and reduce style recalculation.
+- Verified optimizations with production build: `pnpm run build` completed successfully.

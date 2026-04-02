@@ -1,73 +1,109 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nyanya-Pomodoro</title>
-    <meta name="theme-color" content="#bde2ff">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./src/styles/vars.css" />
-    <link rel="stylesheet" href="./src/styles/main.css" />
-    <link rel="stylesheet" href="./src/styles/timer.css" />
-    <link rel="stylesheet" href="./src/styles/stats.css" />
-  </head>
-  <body>
-    <div id="app">
-      <header>
-        <h1>nyanya</h1>
-        <div class="header-actions">
-          <button id="btn-zen-toggle" class="btn-icon" aria-label="Toggle Zen Mode" title="Zen Mode">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <circle cx="12" cy="12" r="4"></circle>
-              <line x1="12" y1="2" x2="12" y2="22"></line>
-              <line x1="2" y1="12" x2="22" y2="12"></line>
-            </svg>
-          </button>
-          <button id="btn-stats-toggle" class="btn-icon" aria-label="Open Statistics">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="4" y1="21" x2="4" y2="14"></line>
-              <line x1="9" y1="21" x2="9" y2="9"></line>
-              <line x1="14" y1="21" x2="14" y2="15"></line>
-              <line x1="19" y1="21" x2="19" y2="3"></line>
-            </svg>
-          </button>
-        </div>
-      </header>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Nyanya-Pomodoro</title>
+        <meta name="theme-color" content="#bde2ff" />
+        <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+        <link rel="manifest" href="./manifest.webmanifest" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="./src/styles/vars.css" />
+        <link rel="stylesheet" href="./src/styles/main.css" />
+        <link rel="stylesheet" href="./src/styles/timer.css" />
+        <link rel="stylesheet" href="./src/styles/stats.css" />
+    </head>
+    <body>
+        <div id="app">
+            <header>
+                <h1>nyanya</h1>
+                <div class="header-actions">
+                    <button
+                        id="btn-zen-toggle"
+                        class="btn-icon"
+                        aria-label="Toggle Zen Mode"
+                        title="Zen Mode"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="12" y1="2" x2="12" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                        </svg>
+                    </button>
+                    <button
+                        id="btn-stats-toggle"
+                        class="btn-icon"
+                        aria-label="Open Statistics"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                            <line x1="14" y1="21" x2="14" y2="15"></line>
+                            <line x1="19" y1="21" x2="19" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </header>
 
-      <main>
-        <section id="timer-section">
-          <!-- Timer UI goes here via JS -->
-        </section>
-      </main>
+            <main>
+                <section id="timer-section">
+                    <!-- Timer UI goes here via JS -->
+                </section>
+            </main>
 
-      <!-- Modal for tags -->
-      <div id="tags-wrapper-modal" class="modal hidden">
-        <div class="modal-content" style="max-width: 800px;">
-          <button id="btn-close-tags" class="close-button">&times;</button>
-          <section id="tags-section">
-            <!-- Tags Manager UI goes here via JS -->
-          </section>
-        </div>
-      </div>
-      
-      <!-- Modal for statistics -->
-      <div id="stats-modal" class="modal hidden">
-        <div class="modal-content stats-dashboard">
-          <button id="btn-close-stats" class="close-button">&times;</button>
-          <h2>Statistics</h2>
-          <div id="stats-container">
-            <!-- Stats UI gets injected here -->
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div id="tag-forge-modal-container"></div>
+            <!-- Modal for tags -->
+            <div id="tags-wrapper-modal" class="modal hidden">
+                <div class="modal-content" style="max-width: 800px">
+                    <button id="btn-close-tags" class="close-button">
+                        &times;
+                    </button>
+                    <section id="tags-section">
+                        <!-- Tags Manager UI goes here via JS -->
+                    </section>
+                </div>
+            </div>
 
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+            <!-- Modal for statistics -->
+            <div id="stats-modal" class="modal hidden">
+                <div class="modal-content stats-dashboard">
+                    <button id="btn-close-stats" class="close-button">
+                        &times;
+                    </button>
+                    <h2>Statistics</h2>
+                    <div id="stats-container">
+                        <!-- Stats UI gets injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tag-forge-modal-container"></div>
+
+        <script type="module" src="/src/main.ts"></script>
+    </body>
 </html>
