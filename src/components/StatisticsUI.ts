@@ -416,7 +416,7 @@ export class StatisticsUI {
                     {
                         label: "Focus",
                         data: focusData,
-                        backgroundColor: "#d0bcff",
+                        backgroundColor: "rgb(189, 226, 255)",
                     },
                     {
                         label: "Interruptions",
@@ -621,7 +621,7 @@ export class StatisticsUI {
             cell.title = `Hour ${h.hour.toString().padStart(2, "0")}:00: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(h.duration)}`;
 
             if (h.duration > 0) {
-                const color = tagMap.get(h.label)?.color || "#d0bcff";
+                const color = tagMap.get(h.label)?.color || "rgb(189, 226, 255)";
                 const opacity = Math.max(0.2, h.duration / maxDur);
                 cell.style.backgroundColor = color;
                 cell.style.opacity = opacity.toString();
