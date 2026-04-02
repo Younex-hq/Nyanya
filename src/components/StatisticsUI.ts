@@ -159,6 +159,7 @@ export class StatisticsUI {
                     try {
                         await StorageService.importData(json);
                         alert("Import successful!");
+                        await this.tagsUI.loadTags();
                         this.render();
                     } catch (err) {
                         alert("Import failed. Please check the JSON format.");
@@ -177,6 +178,7 @@ export class StatisticsUI {
                     )
                 ) {
                     await StorageService.clearAllData();
+                    await this.tagsUI.loadTags();
                     this.render();
                 }
             });

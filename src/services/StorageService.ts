@@ -116,6 +116,19 @@ export class StorageService {
                     // We clear and replace tags to avoid duplicates/conflicts
                     await db.tags.clear();
                     await db.tags.bulkAdd(data.tags);
+                    
+                    // Ensure "Pomodoro" tag is always present
+                    const pomodoroExists = data.tags.some((t: any) => t.name === 'Pomodoro');
+                    if (!pomodoroExists) {
+                        await db.tags.add({
+                            name: 'Pomodoro',
+                            color: 'rgb(189, 226, 255)',
+                            focusTime: 25,
+                            breakTime: 5,
+                            longBreakTime: 15,
+                            sessionsBeforeLongBreak: 4
+                        });
+                    }
                 }
 
                 if (data.sessions && Array.isArray(data.sessions)) {

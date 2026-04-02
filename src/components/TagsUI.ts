@@ -115,9 +115,16 @@ export class TagsUI {
         this.attachEvents();
     }
 
-    private async loadTags() {
+    public async loadTags() {
         this.tags = await StorageService.getTags();
         this.renderList();
+
+        // Ensure TimerService has a valid tag if it was cleared
+        const activeTagId = this.timerService.activeTag?.id;
+        const exists = this.tags.some(t => t.id === activeTagId);
+        if (!exists && this.tags.length > 0) {
+            this.timerService.setTag(this.tags[0]);
+        }
     }
 
     private async renderList() {
@@ -244,6 +251,9 @@ export class TagsUI {
                 .getElementById("tags-wrapper-modal")
                 ?.classList.add("hidden");
             form.reset();
+            const nameInput = document.getElementById("tag-name") as HTMLInputElement;
+            nameInput.disabled = false;
+            nameInput.title = "";
             (document.getElementById("tag-id") as HTMLInputElement).value = "";
             document.getElementById("tag-forge-title")!.textContent =
                 "Create Tag";
@@ -366,14 +376,14 @@ export class TagsUI {
         const modal = document.getElementById("tag-modal")!;
         const form = document.getElementById("tag-form") as HTMLFormElement;
         const btnDelete = document.getElementById("btn-delete-tag")!;
+        const nameInput = document.getElementById("tag-name") as HTMLInputElement;
 
         form.reset();
         document.getElementById("tag-forge-title")!.textContent =
             "Edit Tag";
         (document.getElementById("tag-id") as HTMLInputElement).value =
             tag.id!.toString();
-        (document.getElementById("tag-name") as HTMLInputElement).value =
-            tag.name;
+        nameInput.value = tag.name;
         (document.getElementById("tag-color") as HTMLInputElement).value =
             tag.color;
         (document.getElementById("tag-focus") as HTMLInputElement).value =
@@ -385,7 +395,17 @@ export class TagsUI {
         (document.getElementById("tag-sessionslb") as HTMLInputElement).value =
             tag.sessionsBeforeLongBreak.toString();
 
-        btnDelete.classList.remove("hidden");
+        // Restrictions for the default Pomodoro tag
+        if (tag.name === 'Pomodoro') {
+            nameInput.disabled = true;
+            nameInput.title = "Default tag name cannot be changed";
+            btnDelete.classList.add("hidden");
+        } else {
+            nameInput.disabled = false;
+            nameInput.title = "";
+            btnDelete.classList.remove("hidden");
+        }
+
         this.updatePreview();
         document.getElementById("tags-wrapper-modal")?.classList.add("hidden");
         modal.classList.remove("hidden");
