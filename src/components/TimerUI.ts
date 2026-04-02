@@ -27,10 +27,12 @@ export class TimerUI {
                 </div>
 
                 <div class="timer-controls" id="timer-controls">
-                    <button class="btn-primary" id="btn-main">Start Focus</button>
-                    <button class="btn-secondary hidden" id="btn-secondary">Pause</button>
+                    <button class="btn-secondary hidden" id="btn-cancel" title="Cancel session" style="width: 54px; padding: 0; font-weight: 700; color: var(--sys-color-error);">✕</button>
                     <button class="btn-secondary hidden" id="btn-restart">Restart</button>
+                    <button class="btn-primary" id="btn-main">Start Focus</button>
                     <button class="btn-secondary hidden" id="btn-skip-focus">Skip to Break</button>
+                    
+                    <button class="btn-secondary hidden" id="btn-secondary">Pause</button>
                     <button class="btn-secondary hidden" id="btn-skip-break">Skip Break</button>
                 </div>
                 
@@ -52,6 +54,7 @@ export class TimerUI {
     private attachEvents() {
         const btnMain = document.getElementById('btn-main')!;
         const btnSecondary = document.getElementById('btn-secondary')!;
+        const btnCancel = document.getElementById('btn-cancel')!;
         const btnSkipBreak = document.getElementById('btn-skip-break')!;
         const btnAddIdle = document.getElementById('btn-add-idle')!;
         const notesInput = document.getElementById('session-notes') as HTMLInputElement;
@@ -67,6 +70,13 @@ export class TimerUI {
                 this.timerService.startFocus(); // resumes
             } else if (state === 'BreakPaused') {
                 this.timerService.startBreak(); // resumes
+            }
+        });
+
+        btnCancel.addEventListener('click', () => {
+            if (window.confirm("Cancel this session? Progress will be lost.")) {
+                this.timerService.cancelSession();
+                notesInput.value = '';
             }
         });
 
@@ -137,6 +147,7 @@ export class TimerUI {
         const intTime = document.getElementById('interruptions-time')!;
         const btnRestart = document.getElementById('btn-restart')!;
         const btnSkipFocus = document.getElementById('btn-skip-focus')!;
+        const btnCancel = document.getElementById('btn-cancel')!;
 
         const state = this.timerService.getState();
         const tag = this.timerService.activeTag;
@@ -183,6 +194,7 @@ export class TimerUI {
         // Default: hide extras 
         btnRestart.classList.add('hidden');
         btnSkipFocus.classList.add('hidden');
+        btnCancel.classList.add('hidden');
 
         // Idle display
         if (state === 'IdleAfterFocus') {
@@ -210,6 +222,7 @@ export class TimerUI {
                 btnSecondary.classList.add('hidden');
                 btnRestart.classList.remove('hidden');
                 btnSkipFocus.classList.remove('hidden');
+                btnCancel.classList.remove('hidden');
                 btnSkipBreak.classList.add('hidden');
             } else if (state === 'Break') {
                 btnMain.classList.add('hidden');
