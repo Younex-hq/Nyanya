@@ -86,7 +86,22 @@ export class StatisticsUI {
                             <button id="btn-timeline-next" class="btn-icon-small">›</button>
                         </div>
                     </div>
-                    <div id="timeline-list" class="timeline-list"></div>
+                    <div id="timeline-list" class="timeline-list" style="margin-bottom: 1.5rem;"></div>
+
+                    <!-- Compact Productive Hours attached to Timeline -->
+                    <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <h4 style="margin: 0; font-size: 0.95rem; opacity: 0.8; font-weight: 600;">Productive Hours</h4>
+                            <div style="font-size: 0.85rem; opacity: 0.8;">
+                                <span style="opacity: 0.6;">Total Focus: </span>
+                                <strong id="stat-timeline-focus" style="color: var(--sys-color-primary); font-weight: 700;">00:00</strong>
+                            </div>
+                        </div>
+                        <div id="heatmap-timeline-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <div class="heatmap-grid daily-heatmap" id="heatmap-timeline-hours"></div>
+                            <div class="heatmap-labels daily-labels" id="heatmap-timeline-labels" style="font-size: 0.65rem;"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="stat-card heatmap-container" style="margin-top: 1rem;">
@@ -321,6 +336,8 @@ export class StatisticsUI {
             (s) => s.end.startsWith(dateStr) && !s.is_break,
         );
         this.renderTimeline(timelineSessions, tagMap);
+        this.renderTimelineProductiveHours(timelineSessions, tagMap);
+        this.renderTimelineDayFocus(timelineSessions);
     }
 
     private formatDateNav(date: Date): string {
@@ -582,5 +599,44 @@ export class StatisticsUI {
             `;
             list.appendChild(el);
         });
+    }
+
+    private renderTimelineProductiveHours(
+        sessions: Session[],
+        tagMap: Map<string, Tag>,
+    ) {
+        const gridEl = document.getElementById("heatmap-timeline-hours")!;
+        const labelsEl = document.getElementById("heatmap-timeline-labels")!;
+        gridEl.innerHTML = "";
+        labelsEl.innerHTML = "";
+
+        const hours = StatisticsHelpers.getProductiveHoursVector(sessions);
+        const maxDur = Math.max(...hours.map((h) => h.duration), 1);
+
+        hours.forEach((h) => {
+            // Cell
+            const cell = document.createElement("div");
+            cell.className = "heatmap-cell";
+            cell.title = `Hour ${h.hour.toString().padStart(2, "0")}:00: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(h.duration)}`;
+
+            if (h.duration > 0) {
+                const color = tagMap.get(h.label)?.color || "#d0bcff";
+                const opacity = Math.max(0.2, h.duration / maxDur);
+                cell.style.backgroundColor = color;
+                cell.style.opacity = opacity.toString();
+            }
+            gridEl.appendChild(cell);
+
+            // Label
+            const label = document.createElement("div");
+            label.textContent = h.hour.toString().padStart(2, "0");
+            labelsEl.appendChild(label);
+        });
+    }
+
+    private renderTimelineDayFocus(sessions: Session[]) {
+        const totalFocus = StatisticsHelpers.getFocusTimeMin(sessions);
+        document.getElementById("stat-timeline-focus")!.textContent =
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(totalFocus);
     }
 }
