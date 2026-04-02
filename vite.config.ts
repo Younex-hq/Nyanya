@@ -12,7 +12,7 @@ export default defineConfig({
                 "masked-icon.svg",
             ],
             manifest: {
-                name: "Nyanya (Pomodoro)",
+                name: "Nyanya",
                 short_name: "Nyanya",
                 description:
                     "A Pomodoro timer with statistics and offline support.",
@@ -25,16 +25,18 @@ export default defineConfig({
                         src: "pwa-192x192.png",
                         sizes: "192x192",
                         type: "image/png",
+                        purpose: "any",
                     },
                     {
                         src: "pwa-512x512.png",
                         sizes: "512x512",
                         type: "image/png",
+                        purpose: "any",
                     },
                     {
-                        src: "masked-icon.svg",
+                        src: "pwa-512x512.png",
                         sizes: "512x512",
-                        type: "image/svg+xml",
+                        type: "image/png",
                         purpose: "maskable",
                     },
                 ],
