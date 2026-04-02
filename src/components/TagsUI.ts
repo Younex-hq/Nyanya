@@ -41,69 +41,84 @@ export class TagsUI {
         )!;
         forgeContainer.innerHTML = `
             <div id="tag-modal" class="modal hidden">
-                <div class="modal-content tag-forge-card" style="max-width: 500px; padding: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column;">
+                <div class="modal-content tag-forge-card" style="max-width: 480px; padding: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; background-color: #1e1e23; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 24px 48px rgba(0,0,0,0.5); border-radius: 24px;">
                     <!-- Header with Preview -->
-                    <div class="tag-forge-header">
-                        <button class="close-button" id="btn-close-tag" style="top: 0.5rem; right: 0.5rem; z-index: 10;">&times;</button>
-                        <div class="tag-forge-preview-area">
-                            <div id="tag-preview-badge" class="tag-badge" style="transform: scale(1.2); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                                <span class="tag-badge-name">New Tag</span>
-                                <span class="tag-session-count">0</span>
+                    <div class="tag-forge-header" style="height: 110px; background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <div style="position: absolute; top: -50%; left: -20%; width: 140%; height: 200%; background: radial-gradient(circle at center, var(--sys-color-primary-container) 0%, transparent 70%); opacity: 0.2; pointer-events: none;"></div>
+                        
+                        <button class="close-button" id="btn-close-tag" style="top: 0.75rem; right: 0.75rem; z-index: 10; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); width: 28px; height: 28px; font-size: 1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0;">&times;</button>
+                        
+                        <div class="tag-forge-preview-area" style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                            <h2 id="tag-forge-title" style="margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.2px; color: var(--sys-color-primary); text-transform: none; opacity: 0.9;">Tag Forge</h2>
+                            <div id="tag-preview-badge" class="tag-badge" style="transform: scale(0.9); box-shadow: 0 8px 20px rgba(0,0,0,0.3); border-width: 1.5px; margin: 0;">
+                                <span class="tag-badge-name" style="font-weight: 700; letter-spacing: 0.5px;">New Tag</span>
+                                <span class="tag-session-count" style="background: rgba(255,255,255,0.2); color: white; box-shadow: none;">0</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Body with Fields -->
-                    <div class="tag-forge-body" style="padding: 2.5rem;">
-                        <h2 id="tag-forge-title" style="margin: 0 0 2rem 0; text-align: center; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px; color: var(--sys-color-primary, #d0bcff);">Tag Forge</h2>
-
-                        <form id="tag-form" style="display:flex; flex-direction:column; gap: 1.5rem;">
+                    <div class="tag-forge-body" style="padding: 1.5rem 1.75rem 1.75rem;">
+                        <form id="tag-form" style="display:flex; flex-direction:column; gap: 1.25rem;">
                             <input type="hidden" id="tag-id" />
 
                             <div class="input-module">
-                                <label style="font-size: 0.8rem; text-transform: uppercase; opacity: 0.6; margin-bottom: 0.5rem; display: block;">Identity</label>
-                                <div style="display: flex; gap: 1rem; align-items: center;">
-                                    <input type="text" id="tag-name" class="input-field" placeholder="Tag Name..." style="flex: 1; margin: 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);" required />
-                                    <div class="color-picker-wrapper">
-                                        <input type="color" id="tag-color" value="#d0bcff" />
+                                <label style="font-size: 0.65rem; text-transform: uppercase; opacity: 0.4; margin-bottom: 0.5rem; display: block; font-weight: 700; letter-spacing: 1px;">Identity</label>
+                                <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem;">
+                                    <input type="text" id="tag-name" class="input-field" placeholder="Tag Name..." style="flex: 1; margin: 0; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.8rem 1rem; font-weight: 500; font-size: 0.95rem;" required />
+                                    <div class="color-picker-wrapper" style="width: 42px; height: 42px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
+                                        <input type="color" id="tag-color" value="#d0bcff" style="width: 150%; height: 150%; margin: -25%;" />
+                                    </div>
+                                </div>
+                                <!-- Predefined Colors -->
+                                <div id="preset-colors" style="display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; background: rgba(0,0,0,0.15); padding: 0.5rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03);">
+                                    <!-- Preset colors injected here -->
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255,255,255,0.015); padding: 1.25rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.04);">
+                                <label style="font-size: 0.65rem; text-transform: uppercase; opacity: 0.4; margin-bottom: 0.75rem; display: block; font-weight: 700; letter-spacing: 1px;">Parameters</label>
+                                <div class="setting-module-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                    <div class="setting-module" style="background: rgba(0,0,0,0.1); border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 0.25rem;">
+                                        <label style="opacity: 0.5; font-size: 0.6rem; margin: 0;">Focus</label>
+                                        <div class="input-with-unit" style="align-items: center;">
+                                            <input type="number" id="tag-focus" value="25" min="1" required style="font-size: 1.1rem; width: 100%;" />
+                                            <span style="opacity: 0.3; font-size: 0.7rem;">min</span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-module" style="background: rgba(0,0,0,0.1); border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 0.25rem;">
+                                        <label style="opacity: 0.5; font-size: 0.6rem; margin: 0;">Short Break</label>
+                                        <div class="input-with-unit" style="align-items: center;">
+                                            <input type="number" id="tag-break" value="5" min="1" required style="font-size: 1.1rem; width: 100%;" />
+                                            <span style="opacity: 0.3; font-size: 0.7rem;">min</span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-module" style="background: rgba(0,0,0,0.1); border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 0.25rem;">
+                                        <label style="opacity: 0.5; font-size: 0.6rem; margin: 0;">Long Break</label>
+                                        <div class="input-with-unit" style="align-items: center;">
+                                            <input type="number" id="tag-longbreak" value="15" min="1" required style="font-size: 1.1rem; width: 100%;" />
+                                            <span style="opacity: 0.3; font-size: 0.7rem;">min</span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-module" style="background: rgba(0,0,0,0.1); border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 0.25rem;">
+                                        <label style="opacity: 0.5; font-size: 0.6rem; margin: 0;">Cycle</label>
+                                        <div class="input-with-unit" style="align-items: center;">
+                                            <input type="number" id="tag-sessionslb" value="4" min="1" required style="font-size: 1.1rem; width: 100%;" />
+                                            <span style="opacity: 0.3; font-size: 0.7rem;">qty</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="setting-module-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                <div class="setting-module">
-                                    <label>Focus</label>
-                                    <div class="input-with-unit">
-                                        <input type="number" id="tag-focus" value="25" min="1" required />
-                                        <span>min</span>
-                                    </div>
-                                </div>
-                                <div class="setting-module">
-                                    <label>Break</label>
-                                    <div class="input-with-unit">
-                                        <input type="number" id="tag-break" value="5" min="1" required />
-                                        <span>min</span>
-                                    </div>
-                                </div>
-                                <div class="setting-module">
-                                    <label>Long Break</label>
-                                    <div class="input-with-unit">
-                                        <input type="number" id="tag-longbreak" value="15" min="1" required />
-                                        <span>min</span>
-                                    </div>
-                                </div>
-                                <div class="setting-module">
-                                    <label>Sessions</label>
-                                    <div class="input-with-unit">
-                                        <input type="number" id="tag-sessionslb" value="4" min="1" required />
-                                        <span>qty</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style="display:flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
-                                <button type="submit" class="btn-primary" style="width: 100%; padding: 1.25rem;">Save</button>
-                                <button type="button" id="btn-delete-tag" class="btn-secondary danger-button hidden" style="width: 100%; border: none; background: rgba(255,0,0,0.1); color: #ff5555;">Discard Tag</button>
+                            <div style="display:flex; gap: 0.75rem; margin-top: 0.25rem;">
+                                <button type="button" id="btn-delete-tag" class="btn-secondary danger-button hidden" style="flex: 1; border: none; background: rgba(242, 184, 181, 0.1) !important; color: #f2b8b5 !important; padding: 0.8rem; font-weight: 600; font-size: 0.9rem; border-radius: 14px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                    Discard
+                                </button>
+                                <button type="submit" class="btn-primary" style="flex: 2; padding: 0.8rem; font-weight: 700; font-size: 1rem; border-radius: 14px; box-shadow: 0 4px 12px var(--sys-color-primary-container); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                    Save Tag
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -112,7 +127,62 @@ export class TagsUI {
         `;
 
         this.loadTags();
+        this.renderPresetColors();
         this.attachEvents();
+    }
+
+    private renderPresetColors() {
+        const container = document.getElementById("preset-colors")!;
+        container.innerHTML = "";
+
+        const hues = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+        
+        // HSL (*, 100, 87) pattern
+        // As standard HSL is (0-360, 0-100%, 0-100%), I'll interpret this as a light theme
+        // matching the primary theme color rgb(189, 226, 255) which is hsl(210, 100%, 87%)
+        hues.forEach(hue => {
+            // HSL (*, 100%, 87%) which corresponds to the theme's light pastel style
+            const color = `hsl(${hue}, 100%, 87%)`;
+            const hex = this.hslToHex(hue, 100, 87);
+            
+            const chip = document.createElement("div");
+            chip.style.width = "24px";
+            chip.style.height = "24px";
+            chip.style.borderRadius = "50%";
+            chip.style.backgroundColor = color;
+            chip.style.cursor = "pointer";
+            chip.style.border = "2px solid transparent";
+            chip.style.transition = "transform 0.2s ease, border-color 0.2s ease";
+            chip.title = `Hue: ${hue}`;
+
+            chip.addEventListener("click", () => {
+                const colorInput = document.getElementById("tag-color") as HTMLInputElement;
+                colorInput.value = hex;
+                this.updatePreview();
+                this.updatePresetHighlights(hex);
+            });
+
+            chip.addEventListener("mouseenter", () => {
+                chip.style.transform = "scale(1.2)";
+            });
+
+            chip.addEventListener("mouseleave", () => {
+                chip.style.transform = "scale(1)";
+            });
+
+            container.appendChild(chip);
+        });
+    }
+
+    private hslToHex(h: number, s: number, l: number) {
+        l /= 100;
+        const a = s * Math.min(l, 1 - l) / 100;
+        const f = (n: number) => {
+            const k = (n + h / 30) % 12;
+            const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+            return Math.round(255 * color).toString(16).padStart(2, '0');
+        };
+        return `#${f(0)}${f(8)}${f(4)}`;
     }
 
     public async loadTags() {
@@ -254,8 +324,37 @@ export class TagsUI {
                 "Create Tag";
             document.getElementById("btn-delete-tag")!.classList.add("hidden");
             this.updatePreview();
+            this.updatePresetHighlights("");
             location.hash = 'forge';
         });
+    }
+
+    private updatePresetHighlights(hex: string) {
+        const container = document.getElementById("preset-colors");
+        if (!container) return;
+        
+        container.querySelectorAll("div").forEach(chip => {
+            const chipColor = chip.style.backgroundColor;
+            // chipColor is usually rgb(...) but could be hex or hsl depending on browser
+            // We'll compare hex values
+            const chipHex = this.rgbToHex(chipColor);
+            if (chipHex.toLowerCase() === hex.toLowerCase()) {
+                chip.style.borderColor = "white";
+            } else {
+                chip.style.borderColor = "transparent";
+            }
+        });
+    }
+
+    private rgbToHex(rgb: string) {
+        if (rgb.startsWith('#')) return rgb;
+        // Handle both rgb and rgba
+        const match = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/);
+        if (!match) return "";
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 
     private attachEvents() {
@@ -271,7 +370,10 @@ export class TagsUI {
             "tag-color",
         ) as HTMLInputElement;
         nameInput.addEventListener("input", () => this.updatePreview());
-        colorInput.addEventListener("input", () => this.updatePreview());
+        colorInput.addEventListener("input", () => {
+            this.updatePreview();
+            this.updatePresetHighlights(colorInput.value);
+        });
 
         btnClose.addEventListener("click", () => {
             history.back();
@@ -410,6 +512,7 @@ export class TagsUI {
         }
 
         this.updatePreview();
+        this.updatePresetHighlights(tag.color);
         document.getElementById("tags-wrapper-modal")?.classList.add("hidden");
         modal.classList.remove("hidden");
     }
