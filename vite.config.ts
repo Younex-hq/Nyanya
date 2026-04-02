@@ -8,8 +8,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Pomodoro Web App',
-        short_name: 'Pomodoro',
+        name: 'Nyanya (Pomodoro) ',
+        short_name: 'Nyanya',
         description: 'A Pomodoro timer with statistics and offline support.',
         theme_color: '#1a1a1a',
         icons: [
