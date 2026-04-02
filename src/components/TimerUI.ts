@@ -128,9 +128,17 @@ export class TimerUI {
     }
 
     private formatTime(totalSeconds: number) {
-        const m = Math.floor(totalSeconds / 60);
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
         const s = totalSeconds % 60;
-        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        
+        const mStr = m.toString().padStart(2, '0');
+        const sStr = s.toString().padStart(2, '0');
+        
+        if (h > 0) {
+            return `${h.toString().padStart(2, '0')}:${mStr}:${sStr}`;
+        }
+        return `${mStr}:${sStr}`;
     }
 
     public render() {

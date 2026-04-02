@@ -263,7 +263,9 @@ export class StatisticsUI {
                 StatisticsHelpers.getBreakTimeMin(todaySessions),
             );
         document.getElementById("stat-today-int")!.textContent =
-            StatisticsHelpers.getInterruptionsMin(todaySessions).toString();
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
+                StatisticsHelpers.getInterruptionsMin(todaySessions),
+            );
 
         const rangeStr = (
             document.getElementById("stat-range-select") as HTMLSelectElement
@@ -281,7 +283,9 @@ export class StatisticsUI {
                 StatisticsHelpers.getBreakTimeMin(rangeSessions),
             );
         document.getElementById("stat-range-int")!.textContent =
-            StatisticsHelpers.getInterruptionsMin(rangeSessions).toString();
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
+                StatisticsHelpers.getInterruptionsMin(rangeSessions),
+            );
 
         this.renderGraphs(rangeSessions, tagMap);
         this.renderProductiveHours(sessions, tagMap);
