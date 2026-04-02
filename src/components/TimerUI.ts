@@ -36,9 +36,14 @@ export class TimerUI {
                     <button class="btn-secondary hidden" id="btn-skip-break">Skip Break</button>
                 </div>
                 
-                <div class="idle-controls hidden" id="idle-controls">
-                    <span>Idle: <span id="idle-display">00:00</span></span>
-                    <button class="btn-icon" id="btn-add-idle" title="Add to session">+</button>
+                <div class="idle-controls hidden" id="idle-controls" style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; font-weight: 700;">OVERTIME</span>
+                        <span id="idle-display" style="font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 600; color: var(--sys-color-primary);">00:00</span>
+                    </div>
+                    <button class="btn-icon" id="btn-add-idle" title="Add this extra time to your completed focus session" style="background: var(--sys-color-primary-container); color: var(--sys-color-primary); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.2s ease;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
                 </div>
 
                 <div class="interruptions-display hidden" id="interruptions-display" style="color: var(--sys-color-error); margin-top: 1rem;">
@@ -207,6 +212,7 @@ export class TimerUI {
         // Idle display
         if (state === 'IdleAfterFocus') {
             idleControls.classList.remove('hidden');
+            idleControls.style.display = 'flex'; // override hidden class properly
             idleDisplay.textContent = this.formatTime(this.timerService.idleSeconds);
             btnMain.textContent = 'Start Break';
             btnMain.classList.remove('hidden');
@@ -214,6 +220,7 @@ export class TimerUI {
             btnSkipBreak.classList.add('hidden');
         } else {
             idleControls.classList.add('hidden');
+            idleControls.style.display = ''; // reset inline style
             if (state === 'Idle') {
                 btnMain.textContent = 'Start Focus';
                 btnMain.classList.remove('hidden');
