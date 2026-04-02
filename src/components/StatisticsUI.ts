@@ -1,8 +1,8 @@
-import Chart from 'chart.js/auto';
-import { StorageService } from '../services/StorageService.ts';
-import { StatisticsHelpers } from '../utils/StatisticsHelpers.ts';
-import type { Session, Tag } from '../models/types.ts';
-import { TagsUI } from './TagsUI.ts';
+import Chart from "chart.js/auto";
+import { StorageService } from "../services/StorageService.ts";
+import { StatisticsHelpers } from "../utils/StatisticsHelpers.ts";
+import type { Session, Tag } from "../models/types.ts";
+import { TagsUI } from "./TagsUI.ts";
 
 export class StatisticsUI {
     private container: HTMLElement;
@@ -31,7 +31,7 @@ export class StatisticsUI {
                             <div class="stat-box"><span>Interruptions</span> <strong id="stat-today-int">00:00</strong></div>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card heatmap-container">
                         <h3>Productive Hours (Today)</h3>
                         <div id="heatmap-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
@@ -117,18 +117,22 @@ export class StatisticsUI {
             </div>
         `;
 
-        document.getElementById('btn-export-json-bottom')!.addEventListener('click', () => {
-            StorageService.exportData();
-        });
+        document
+            .getElementById("btn-export-json-bottom")!
+            .addEventListener("click", () => {
+                StorageService.exportData();
+            });
 
-        const btnImport = document.getElementById('btn-import-json-bottom')!;
-        const inputImport = document.getElementById('input-import-json') as HTMLInputElement;
+        const btnImport = document.getElementById("btn-import-json-bottom")!;
+        const inputImport = document.getElementById(
+            "input-import-json",
+        ) as HTMLInputElement;
 
-        btnImport.addEventListener('click', () => {
+        btnImport.addEventListener("click", () => {
             inputImport.click();
         });
 
-        inputImport.addEventListener('change', async (e) => {
+        inputImport.addEventListener("change", async (e) => {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (file) {
                 const reader = new FileReader();
@@ -136,54 +140,89 @@ export class StatisticsUI {
                     const json = ev.target?.result as string;
                     try {
                         await StorageService.importData(json);
-                        alert('Import successful!');
+                        alert("Import successful!");
                         this.render();
                     } catch (err) {
-                        alert('Import failed. Please check the JSON format.');
+                        alert("Import failed. Please check the JSON format.");
                     }
                 };
                 reader.readAsText(file);
             }
         });
 
-        document.getElementById('btn-clear-data-bottom')!.addEventListener('click', async () => {
-            if (window.confirm('Are you sure you want to clear all session data? This cannot be undone.')) {
-                await StorageService.clearSessions();
+        document
+            .getElementById("btn-clear-data-bottom")!
+            .addEventListener("click", async () => {
+                if (
+                    window.confirm(
+                        "Are you sure you want to clear all session data? This cannot be undone.",
+                    )
+                ) {
+                    await StorageService.clearSessions();
+                    this.render();
+                }
+            });
+
+        document
+            .getElementById("stat-range-select")!
+            .addEventListener("change", () => {
                 this.render();
-            }
-        });
+            });
 
-        document.getElementById('stat-range-select')!.addEventListener('change', () => {
-            this.render();
-        });
+        document
+            .getElementById("btn-timeline-prev")!
+            .addEventListener("click", () => {
+                this.timelineDate.setDate(this.timelineDate.getDate() - 1);
+                this.renderTimelineOnly();
+            });
 
-        document.getElementById('btn-timeline-prev')!.addEventListener('click', () => {
-            this.timelineDate.setDate(this.timelineDate.getDate() - 1);
-            this.renderTimelineOnly();
-        });
-
-        document.getElementById('btn-timeline-next')!.addEventListener('click', () => {
-            this.timelineDate.setDate(this.timelineDate.getDate() + 1);
-            this.renderTimelineOnly();
-        });
+        document
+            .getElementById("btn-timeline-next")!
+            .addEventListener("click", () => {
+                this.timelineDate.setDate(this.timelineDate.getDate() + 1);
+                this.renderTimelineOnly();
+            });
     }
 
     public async render() {
         const sessions = await StorageService.getSessions();
         const tags = await StorageService.getTags();
-        const tagMap = new Map(tags.map(t => [t.name, t]));
+        const tagMap = new Map(tags.map((t) => [t.name, t]));
 
         const todaySessions = StatisticsHelpers.getTodaySessions(sessions);
-        
-        document.getElementById('stat-today-focus')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getFocusTimeMin(todaySessions));
-        document.getElementById('stat-today-break')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getBreakTimeMin(todaySessions));
-        document.getElementById('stat-today-int')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getInterruptionsMin(todaySessions));
 
-        const rangeStr = (document.getElementById('stat-range-select') as HTMLSelectElement).value as any;
-        const rangeSessions = StatisticsHelpers.filterByRange(sessions, rangeStr);
-        document.getElementById('stat-range-focus')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getFocusTimeMin(rangeSessions));
-        document.getElementById('stat-range-break')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getBreakTimeMin(rangeSessions));
-        document.getElementById('stat-range-int')!.textContent = StatisticsHelpers.formatDecimalMinutesToHHMMSS(StatisticsHelpers.getInterruptionsMin(rangeSessions));
+        document.getElementById("stat-today-focus")!.textContent =
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
+                StatisticsHelpers.getFocusTimeMin(todaySessions),
+            );
+        document.getElementById("stat-today-break")!.textContent =
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
+                StatisticsHelpers.getBreakTimeMin(todaySessions),
+            );
+        document.getElementById("stat-today-int")!.textContent =
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
+                StatisticsHelpers.getInterruptionsMin(todaySessions),
+            );
+
+        const rangeStr = (
+            document.getElementById("stat-range-select") as HTMLSelectElement
+        ).value as any;
+        const rangeSessions = StatisticsHelpers.filterByRange(
+            sessions,
+            rangeStr,
+        );
+        document.getElementById("stat-range-focus")!.textContent =
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
+                StatisticsHelpers.getFocusTimeMin(rangeSessions),
+            );
+        document.getElementById("stat-range-break")!.textContent =
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
+                StatisticsHelpers.getBreakTimeMin(rangeSessions),
+            );
+        document.getElementById("stat-range-int")!.textContent =
+            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
+                StatisticsHelpers.getInterruptionsMin(rangeSessions),
+            );
 
         this.renderGraphs(rangeSessions, tagMap);
         this.renderProductiveHours(sessions, tagMap);
@@ -193,12 +232,12 @@ export class StatisticsUI {
     }
 
     private renderTagLegend(tags: Tag[]) {
-        const legend = document.getElementById('stats-tags-legend')!;
-        legend.innerHTML = '';
-        
-        tags.forEach(tag => {
-            const pill = document.createElement('div');
-            pill.className = 'tag-pill';
+        const legend = document.getElementById("stats-tags-legend")!;
+        legend.innerHTML = "";
+
+        tags.forEach((tag) => {
+            const pill = document.createElement("div");
+            pill.className = "tag-pill";
             pill.innerHTML = `
                 <span class="tag-dot" style="background-color: ${tag.color}"></span>
                 <span class="tag-name">${tag.name}</span>
@@ -207,9 +246,9 @@ export class StatisticsUI {
         });
 
         // Edit Tags Button Pill
-        const editPills = document.createElement('div');
-        editPills.className = 'tag-pill add-tag-pill';
-        editPills.id = 'btn-add-tag-from-stats';
+        const editPills = document.createElement("div");
+        editPills.className = "tag-pill add-tag-pill";
+        editPills.id = "btn-add-tag-from-stats";
         editPills.innerHTML = `
             <span class="tag-plus">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -217,11 +256,13 @@ export class StatisticsUI {
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
             </span>
-            <span class="tag-name">Edit Tags</span>
+            <span class="tag-name">Update/Add</span>
         `;
-        editPills.addEventListener('click', () => {
+        editPills.addEventListener("click", () => {
             this.tagsUI.setManagementMode(true);
-            document.getElementById('tags-wrapper-modal')?.classList.remove('hidden');
+            document
+                .getElementById("tags-wrapper-modal")
+                ?.classList.remove("hidden");
         });
         legend.appendChild(editPills);
     }
@@ -229,119 +270,150 @@ export class StatisticsUI {
     private async renderTimelineOnly() {
         const sessions = await StorageService.getSessions();
         const tags = await StorageService.getTags();
-        const tagMap = new Map(tags.map(t => [t.name, t]));
+        const tagMap = new Map(tags.map((t) => [t.name, t]));
 
-        const dateStr = this.timelineDate.toISOString().split('T')[0];
-        const timelineSessions = sessions.filter(s => s.end.startsWith(dateStr) && !s.is_break);
+        const dateStr = this.timelineDate.toISOString().split("T")[0];
+        const timelineSessions = sessions.filter(
+            (s) => s.end.startsWith(dateStr) && !s.is_break,
+        );
         this.renderTimeline(timelineSessions, tagMap);
     }
 
     private formatDateNav(date: Date): string {
-        const d = date.getDate().toString().padStart(2, '0');
-        const m = date.toLocaleString('en-US', { month: 'short' });
+        const d = date.getDate().toString().padStart(2, "0");
+        const m = date.toLocaleString("en-US", { month: "short" });
         const y = date.getFullYear().toString().slice(-2);
         return `${d}-${m}-${y}`;
     }
 
     private renderGraphs(rangeSessions: Session[], tagMap: Map<string, Tag>) {
-        const focusSessions = rangeSessions.filter(s => !s.is_break);
-        
+        const focusSessions = rangeSessions.filter((s) => !s.is_break);
+
         // Ring Graph
         const groupedByTag: Record<string, number> = {};
-        for(const s of focusSessions) {
+        for (const s of focusSessions) {
             groupedByTag[s.label] = (groupedByTag[s.label] || 0) + s.duration;
         }
 
         const labels = Object.keys(groupedByTag);
         const data = Object.values(groupedByTag);
-        const bgColors = labels.map(l => tagMap.get(l)?.color || '#999');
+        const bgColors = labels.map((l) => tagMap.get(l)?.color || "#999");
 
-        const ringCtx = document.getElementById('chart-ring') as HTMLCanvasElement;
-        if(this.ringChartInstance) this.ringChartInstance.destroy();
+        const ringCtx = document.getElementById(
+            "chart-ring",
+        ) as HTMLCanvasElement;
+        if (this.ringChartInstance) this.ringChartInstance.destroy();
         this.ringChartInstance = new Chart(ringCtx, {
-            type: 'doughnut',
+            type: "doughnut",
             data: {
                 labels,
-                datasets: [{ data, backgroundColor: bgColors, borderWidth: 0 }]
+                datasets: [{ data, backgroundColor: bgColors, borderWidth: 0 }],
             },
-            options: { 
-                plugins: { 
-                    legend: { position: 'bottom', labels: { color: '#e6e1e5' } },
+            options: {
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { color: "#e6e1e5" },
+                    },
                     tooltip: {
                         callbacks: {
                             label: (context) => {
                                 const val = context.raw as number;
                                 return `${context.label}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(val)}`;
-                            }
-                        }
-                    }
-                } 
-            }
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         // Bar Graph
-        const lineCtx = document.getElementById('chart-line') as HTMLCanvasElement;
-        if(this.lineChartInstance) this.lineChartInstance.destroy();
-        
-        const daysRaw = [...new Set(rangeSessions.map(s => s.end.split('T')[0]))].sort();
-        const focusData = daysRaw.map(d => rangeSessions.filter(s => s.end.startsWith(d) && !s.is_break).reduce((a,b)=>a+b.duration, 0));
-        const intData = daysRaw.map(d => rangeSessions.filter(s => s.end.startsWith(d)).reduce((a,b)=>a+b.interruptions, 0));
+        const lineCtx = document.getElementById(
+            "chart-line",
+        ) as HTMLCanvasElement;
+        if (this.lineChartInstance) this.lineChartInstance.destroy();
+
+        const daysRaw = [
+            ...new Set(rangeSessions.map((s) => s.end.split("T")[0])),
+        ].sort();
+        const focusData = daysRaw.map((d) =>
+            rangeSessions
+                .filter((s) => s.end.startsWith(d) && !s.is_break)
+                .reduce((a, b) => a + b.duration, 0),
+        );
+        const intData = daysRaw.map((d) =>
+            rangeSessions
+                .filter((s) => s.end.startsWith(d))
+                .reduce((a, b) => a + b.interruptions, 0),
+        );
 
         this.lineChartInstance = new Chart(lineCtx, {
-            type: 'bar',
+            type: "bar",
             data: {
                 labels: daysRaw,
                 datasets: [
-                    { label: 'Focus', data: focusData, backgroundColor: '#d0bcff' },
-                    { label: 'Interruptions', data: intData, backgroundColor: '#f2b8b5' }
-                ]
+                    {
+                        label: "Focus",
+                        data: focusData,
+                        backgroundColor: "#d0bcff",
+                    },
+                    {
+                        label: "Interruptions",
+                        data: intData,
+                        backgroundColor: "#f2b8b5",
+                    },
+                ],
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
-                scales: { 
-                    x: { ticks: { color: '#e6e1e5' } }, 
-                    y: { 
-                        ticks: { 
-                            color: '#e6e1e5',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: "#e6e1e5" } },
+                    y: {
+                        ticks: {
+                            color: "#e6e1e5",
                             stepSize: 30,
                             callback: (value: any) => {
                                 return `${(value / 60).toFixed(1)} h`;
-                            }
-                        } 
-                    } 
+                            },
+                        },
+                    },
                 },
-                plugins: { 
-                    legend: { labels: { color: '#e6e1e5' } },
+                plugins: {
+                    legend: { labels: { color: "#e6e1e5" } },
                     tooltip: {
                         callbacks: {
                             label: (context) => {
                                 const val = context.raw as number;
                                 return `${context.dataset.label}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(val)}`;
-                            }
-                        }
-                    }
-                }
-            }
+                            },
+                        },
+                    },
+                },
+            },
         });
     }
 
-    private renderProductiveHours(sessions: Session[], tagMap: Map<string, Tag>) {
-        const gridEl = document.getElementById('heatmap-hours')!;
-        const labelsEl = document.getElementById('heatmap-labels')!;
-        gridEl.innerHTML = '';
-        labelsEl.innerHTML = '';
-        
-        const hours = StatisticsHelpers.getProductiveHoursVector(sessions);
-        const maxDur = Math.max(...hours.map(h => h.duration), 1);
+    private renderProductiveHours(
+        sessions: Session[],
+        tagMap: Map<string, Tag>,
+    ) {
+        const gridEl = document.getElementById("heatmap-hours")!;
+        const labelsEl = document.getElementById("heatmap-labels")!;
+        gridEl.innerHTML = "";
+        labelsEl.innerHTML = "";
 
-        hours.forEach(h => {
+        const hours = StatisticsHelpers.getProductiveHoursVector(sessions);
+        const maxDur = Math.max(...hours.map((h) => h.duration), 1);
+
+        hours.forEach((h) => {
             // Cell
-            const cell = document.createElement('div');
-            cell.className = 'heatmap-cell';
-            cell.title = `Hour ${h.hour.toString().padStart(2, '0')}:00: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(h.duration)}`;
-            
+            const cell = document.createElement("div");
+            cell.className = "heatmap-cell";
+            cell.title = `Hour ${h.hour.toString().padStart(2, "0")}:00: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(h.duration)}`;
+
             if (h.duration > 0) {
-                const color = tagMap.get(h.label)?.color || '#d0bcff';
+                const color = tagMap.get(h.label)?.color || "#d0bcff";
                 const opacity = Math.max(0.2, h.duration / maxDur);
                 cell.style.backgroundColor = color;
                 cell.style.opacity = opacity.toString();
@@ -349,83 +421,105 @@ export class StatisticsUI {
             gridEl.appendChild(cell);
 
             // Label
-            const label = document.createElement('div');
+            const label = document.createElement("div");
             // Show every label, but only a few numbers could be shown if it's too cramped.
             // Let's try showing all hour numbers in small text.
-            label.textContent = h.hour.toString().padStart(2, '0');
+            label.textContent = h.hour.toString().padStart(2, "0");
             labelsEl.appendChild(label);
         });
     }
 
     private renderYearlyHeatmap(sessions: Session[]) {
-        const gridEl = document.getElementById('heatmap-yearly')!;
-        const monthEl = document.getElementById('heatmap-month-labels')!;
-        gridEl.innerHTML = '';
-        monthEl.innerHTML = '';
-        
+        const gridEl = document.getElementById("heatmap-yearly")!;
+        const monthEl = document.getElementById("heatmap-month-labels")!;
+        gridEl.innerHTML = "";
+        monthEl.innerHTML = "";
+
         const yearlyData = StatisticsHelpers.getYearlyFocusData(sessions);
-        
+
         const now = new Date();
         const daysToShow = 53 * 7;
         const lastYearStart = new Date(now);
         lastYearStart.setDate(now.getDate() - daysToShow + 1);
-        
+
         // Intensity mapping
         const maxFocus = Math.max(...Object.values(yearlyData), 1, 60);
 
         let currentMonth = -1;
-        
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+        ];
 
         for (let i = 0; i < daysToShow; i++) {
             const date = new Date(lastYearStart);
             date.setDate(lastYearStart.getDate() + i);
-            const dateStr = date.toISOString().split('T')[0];
+            const dateStr = date.toISOString().split("T")[0];
             const duration = yearlyData[dateStr] || 0;
 
             // Month labels (only on the first day of the week column)
             if (i % 7 === 0) {
-                const monthLabel = document.createElement('div');
+                const monthLabel = document.createElement("div");
                 const m = date.getMonth();
                 if (m !== currentMonth) {
                     monthLabel.textContent = months[m];
                     currentMonth = m;
                 }
-                monthLabel.style.width = '12px';
+                monthLabel.style.width = "12px";
                 monthEl.appendChild(monthLabel);
             }
-            
-            const cell = document.createElement('div');
-            cell.className = 'heatmap-cell yearly-cell';
+
+            const cell = document.createElement("div");
+            cell.className = "heatmap-cell yearly-cell";
             cell.title = `${dateStr}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(duration)}`;
-            
+
             if (duration > 0) {
-                const intensity = Math.min(Math.ceil((duration / maxFocus) * 4), 4);
-                cell.setAttribute('data-intensity', intensity.toString());
+                const intensity = Math.min(
+                    Math.ceil((duration / maxFocus) * 4),
+                    4,
+                );
+                cell.setAttribute("data-intensity", intensity.toString());
             } else {
-                cell.setAttribute('data-intensity', '0');
+                cell.setAttribute("data-intensity", "0");
             }
             gridEl.appendChild(cell);
         }
     }
 
     private renderTimeline(sessions: Session[], tagMap: Map<string, Tag>) {
-        document.getElementById('timeline-date-label')!.textContent = this.formatDateNav(this.timelineDate);
-        const list = document.getElementById('timeline-list')!;
-        list.innerHTML = '';
-        
-        // sort by most recent 
-        const sorted = [...sessions].sort((a, b) => new Date(b.end).getTime() - new Date(a.end).getTime());
+        document.getElementById("timeline-date-label")!.textContent =
+            this.formatDateNav(this.timelineDate);
+        const list = document.getElementById("timeline-list")!;
+        list.innerHTML = "";
 
-        sorted.forEach(s => {
+        // sort by most recent
+        const sorted = [...sessions].sort(
+            (a, b) => new Date(b.end).getTime() - new Date(a.end).getTime(),
+        );
+
+        sorted.forEach((s) => {
             const dt = new Date(s.end);
             const dStr = dt.toLocaleDateString();
-            const tStr = dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            const el = document.createElement('div');
-            el.className = 'timeline-item redesigned-item';
-            
-            const color = tagMap.get(s.label)?.color || '#ccc';
+            const tStr = dt.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+
+            const el = document.createElement("div");
+            el.className = "timeline-item redesigned-item";
+
+            const color = tagMap.get(s.label)?.color || "#ccc";
 
             el.innerHTML = `
                 <div class="tl-left">
@@ -436,7 +530,7 @@ export class StatisticsUI {
                     <div class="tl-tag" style="background-color: ${color}22; color: ${color}; border-color: ${color}44;">
                         ${s.label}
                     </div>
-                    ${s.notes ? `<div class="tl-notes">${s.notes}</div>` : ''}
+                    ${s.notes ? `<div class="tl-notes">${s.notes}</div>` : ""}
                 </div>
                 <div class="tl-right">
                     <div class="tl-duration">${StatisticsHelpers.formatDecimalMinutesToHHMMSS(s.duration)}</div>
