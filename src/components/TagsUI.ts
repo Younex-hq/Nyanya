@@ -41,7 +41,7 @@ export class TagsUI {
         )!;
         forgeContainer.innerHTML = `
             <div id="tag-modal" class="modal hidden">
-                <div class="modal-content tag-forge-card" style="max-width: 500px; padding: 0; overflow: hidden;">
+                <div class="modal-content tag-forge-card" style="max-width: 500px; padding: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column;">
                     <!-- Header with Preview -->
                     <div class="tag-forge-header">
                         <button class="close-button" id="btn-close-tag" style="top: 0.5rem; right: 0.5rem; z-index: 10;">&times;</button>
@@ -70,7 +70,7 @@ export class TagsUI {
                                 </div>
                             </div>
 
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="setting-module-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div class="setting-module">
                                     <label>Focus</label>
                                     <div class="input-with-unit">

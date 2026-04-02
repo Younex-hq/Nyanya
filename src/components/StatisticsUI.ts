@@ -643,7 +643,6 @@ export class StatisticsUI {
 
         sorted.forEach((s) => {
             const dt = new Date(s.end);
-            const dStr = dt.toLocaleDateString();
             const tStr = dt.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -656,7 +655,6 @@ export class StatisticsUI {
 
             el.innerHTML = `
                 <div class="tl-left">
-                    <small>${dStr}</small>
                     <div class="tl-time">${tStr}</div>
                 </div>
                 <div class="tl-content">
