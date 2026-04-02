@@ -199,8 +199,15 @@ export class StatisticsUI {
         document
             .getElementById("btn-timeline-next")!
             .addEventListener("click", () => {
-                this.timelineDate.setDate(this.timelineDate.getDate() + 1);
-                this.renderTimelineOnly();
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const current = new Date(this.timelineDate);
+                current.setHours(0, 0, 0, 0);
+
+                if (current < today) {
+                    this.timelineDate.setDate(this.timelineDate.getDate() + 1);
+                    this.renderTimelineOnly();
+                }
             });
     }
 
@@ -343,6 +350,10 @@ export class StatisticsUI {
     }
 
     private formatDateNav(date: Date): string {
+        const today = new Date();
+        if (date.toDateString() === today.toDateString()) {
+            return "Today";
+        }
         const d = date.getDate().toString().padStart(2, "0");
         const m = date.toLocaleString("en-US", { month: "short" });
         const y = date.getFullYear().toString().slice(-2);
@@ -609,6 +620,19 @@ export class StatisticsUI {
     private renderTimeline(sessions: Session[], tagMap: Map<string, Tag>) {
         document.getElementById("timeline-date-label")!.textContent =
             this.formatDateNav(this.timelineDate);
+        
+        const btnNext = document.getElementById("btn-timeline-next") as HTMLButtonElement;
+        const today = new Date();
+        if (this.timelineDate.toDateString() === today.toDateString()) {
+            btnNext.disabled = true;
+            btnNext.style.opacity = "0.3";
+            btnNext.style.cursor = "default";
+        } else {
+            btnNext.disabled = false;
+            btnNext.style.opacity = "1";
+            btnNext.style.cursor = "pointer";
+        }
+
         const list = document.getElementById("timeline-list")!;
         list.innerHTML = "";
 
