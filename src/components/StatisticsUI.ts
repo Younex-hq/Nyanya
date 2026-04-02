@@ -10,6 +10,7 @@ export class StatisticsUI {
     private ringChartInstance: Chart | null = null;
     private lineChartInstance: Chart | null = null;
     private timelineDate: Date = new Date();
+    private yearlyHeatmapDate: Date = new Date();
     private selectedTag: string | null = null;
 
     constructor(container: HTMLElement, tagsUI: TagsUI) {
@@ -107,9 +108,16 @@ export class StatisticsUI {
                 </div>
 
                 <div class="stat-card heatmap-container" style="margin-top: 1rem;">
-                    <h3>Yearly Focus Activity</h3>
-                    <div class="heatmap-wrapper" style="overflow-x: auto; display: flex; gap: 0.5rem; padding: 0.5rem 0;">
-                        <div class="heatmap-day-labels" style="display: grid; grid-template-rows: repeat(7, 12px); gap: 3px; font-size: 0.65rem; opacity: 0.6; padding-top: 1.25rem;">
+                    <div class="stat-card-header">
+                        <h3>Yearly Focus Activity</h3>
+                        <div class="timeline-nav">
+                            <button id="btn-yearly-prev" class="btn-icon-small">‹</button>
+                            <span id="yearly-date-label" style="font-size: 0.9rem; font-weight: 500; min-width: 100px; text-align: center;">2024</span>
+                            <button id="btn-yearly-next" class="btn-icon-small">›</button>
+                        </div>
+                    </div>
+                    <div class="heatmap-wrapper" style="overflow-x: auto; display: flex; gap: 0.5rem; padding: 0.5rem 0; position: relative;">
+                        <div class="heatmap-day-labels" style="display: grid; grid-template-rows: repeat(7, 12px); gap: 3px; font-size: 0.65rem; opacity: 0.6; padding-top: 1.25rem; position: sticky; left: 0; background: #212126; z-index: 5; padding-right: 4px;">
                             <div></div> <!-- Sun -->
                             <div>Mon</div>
                             <div></div> <!-- Tue -->
@@ -209,6 +217,23 @@ export class StatisticsUI {
                     this.renderTimelineOnly();
                 }
             });
+
+        document
+            .getElementById("btn-yearly-prev")!
+            .addEventListener("click", () => {
+                this.yearlyHeatmapDate.setFullYear(this.yearlyHeatmapDate.getFullYear() - 1);
+                this.renderYearlyOnly();
+            });
+
+        document
+            .getElementById("btn-yearly-next")!
+            .addEventListener("click", () => {
+                const today = new Date();
+                if (this.yearlyHeatmapDate.getFullYear() < today.getFullYear()) {
+                    this.yearlyHeatmapDate.setFullYear(this.yearlyHeatmapDate.getFullYear() + 1);
+                    this.renderYearlyOnly();
+                }
+            });
     }
 
     private updateDynamicTheme(color: string) {
@@ -261,7 +286,7 @@ export class StatisticsUI {
         this.renderGraphs(rangeSessions, tagMap);
         this.renderProductiveHours(sessions, tagMap);
         this.renderTimelineOnly();
-        this.renderYearlyHeatmap(sessions);
+        this.renderYearlyOnly();
         this.renderTagLegend(tags);
 
         if (this.selectedTag) {
@@ -547,18 +572,47 @@ export class StatisticsUI {
         });
     }
 
+    private async renderYearlyOnly() {
+        let sessions = await StorageService.getSessions();
+        if (this.selectedTag) {
+            sessions = sessions.filter(s => s.label === this.selectedTag);
+        }
+        this.renderYearlyHeatmap(sessions);
+    }
+
     private renderYearlyHeatmap(sessions: Session[]) {
         const gridEl = document.getElementById("heatmap-yearly")!;
         const monthEl = document.getElementById("heatmap-month-labels")!;
+        const dateLabel = document.getElementById("yearly-date-label")!;
+        const btnNext = document.getElementById("btn-yearly-next") as HTMLButtonElement;
+        
         gridEl.innerHTML = "";
         monthEl.innerHTML = "";
 
+        const year = this.yearlyHeatmapDate.getFullYear();
+        dateLabel.textContent = year.toString();
+
+        const today = new Date();
+        if (year >= today.getFullYear()) {
+            btnNext.disabled = true;
+            btnNext.style.opacity = "0.3";
+            btnNext.style.cursor = "default";
+        } else {
+            btnNext.disabled = false;
+            btnNext.style.opacity = "1";
+            btnNext.style.cursor = "pointer";
+        }
+
         const yearlyData = StatisticsHelpers.getYearlyFocusData(sessions);
 
-        const now = new Date();
+        // Calculate start of the year (adjusting to the first Sunday to align columns)
+        const startOfYear = new Date(year, 0, 1);
+        const startDay = startOfYear.getDay(); // 0 = Sun
+        const heatmapStart = new Date(startOfYear);
+        heatmapStart.setDate(startOfYear.getDate() - startDay);
+
+        const daysInYear = 366; // Always show ~53 weeks
         const daysToShow = 53 * 7;
-        const lastYearStart = new Date(now);
-        lastYearStart.setDate(now.getDate() - daysToShow + 1);
 
         // Intensity mapping
         const maxFocus = Math.max(...Object.values(yearlyData), 1, 60);
@@ -581,8 +635,8 @@ export class StatisticsUI {
         ];
 
         for (let i = 0; i < daysToShow; i++) {
-            const date = new Date(lastYearStart);
-            date.setDate(lastYearStart.getDate() + i);
+            const date = new Date(heatmapStart);
+            date.setDate(heatmapStart.getDate() + i);
             const dateStr = date.toISOString().split("T")[0];
             const duration = yearlyData[dateStr] || 0;
 
@@ -590,7 +644,8 @@ export class StatisticsUI {
             if (i % 7 === 0) {
                 const monthLabel = document.createElement("div");
                 const m = date.getMonth();
-                if (m !== currentMonth) {
+                // Only show month label if it's within the requested year
+                if (m !== currentMonth && date.getFullYear() === year) {
                     monthLabel.textContent = months[m];
                     currentMonth = m;
                 }
@@ -600,16 +655,23 @@ export class StatisticsUI {
 
             const cell = document.createElement("div");
             cell.className = "heatmap-cell yearly-cell";
-            cell.title = `${dateStr}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(duration)}`;
-
-            if (duration > 0) {
-                const intensity = Math.min(
-                    Math.ceil((duration / maxFocus) * 4),
-                    4,
-                );
-                cell.setAttribute("data-intensity", intensity.toString());
+            
+            // Dim cells that are not part of the current year
+            if (date.getFullYear() !== year) {
+                cell.style.opacity = "0";
+                cell.style.pointerEvents = "none";
             } else {
-                cell.setAttribute("data-intensity", "0");
+                cell.title = `${dateStr}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(duration)}`;
+
+                if (duration > 0) {
+                    const intensity = Math.min(
+                        Math.ceil((duration / maxFocus) * 4),
+                        4,
+                    );
+                    cell.setAttribute("data-intensity", intensity.toString());
+                } else {
+                    cell.setAttribute("data-intensity", "0");
+                }
             }
             gridEl.appendChild(cell);
         }
