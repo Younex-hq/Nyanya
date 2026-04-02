@@ -447,8 +447,38 @@ body.zen-mode #btn-zen-toggle {
 }
 
 @media (max-width: 768px) {
+    #app {
+        padding: 1rem;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    header h1 {
+        font-size: 1.75rem;
+    }
+
     .modal-content {
         width: 95%;
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
+        max-height: 85vh;
+    }
+
+    .tags-grid {
+        gap: 1rem;
+    }
+
+    .tag-card {
+        width: calc(50% - 0.5rem);
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .tag-card {
+        width: 100%;
     }
 }

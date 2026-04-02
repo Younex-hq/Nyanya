@@ -205,6 +205,8 @@ export class StatisticsUI {
     private updateDynamicTheme(color: string) {
         const root = document.documentElement;
         root.style.setProperty('--sys-color-primary', color);
+        root.style.setProperty('--sys-color-primary-container', `color-mix(in srgb, ${color}, transparent 92%)`);
+        root.style.setProperty('--sys-color-secondary-container', `color-mix(in srgb, ${color}, transparent 95%)`);
     }
 
     public async render() {

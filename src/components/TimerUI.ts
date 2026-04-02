@@ -230,12 +230,7 @@ export class TimerUI {
     private updateDynamicTheme(color: string) {
         const root = document.documentElement;
         root.style.setProperty('--sys-color-primary', color);
-        // Add transparency for containers (using hex alpha or rgba)
-        // If color is #RRGGBB, we can add 26 for ~15% opacity
-        const containerColor = color.length === 7 ? color + '26' : color; 
-        const containerColorSecondary = color.length === 7 ? color + '1a' : color; // 10%
-
-        root.style.setProperty('--sys-color-primary-container', containerColor);
-        root.style.setProperty('--sys-color-secondary-container', containerColorSecondary);
+        root.style.setProperty('--sys-color-primary-container', `color-mix(in srgb, ${color}, transparent 92%)`);
+        root.style.setProperty('--sys-color-secondary-container', `color-mix(in srgb, ${color}, transparent 95%)`);
     }
 }

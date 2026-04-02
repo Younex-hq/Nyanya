@@ -9,12 +9,12 @@
   
   --sys-color-primary: rgb(189, 226, 255); /* New Sky Blue Default */
   --sys-color-on-primary: #003354;
-  --sys-color-primary-container: rgba(189, 226, 255, 0.15);
+  --sys-color-primary-container: rgba(189, 226, 255, 0.08); /* Reduced opacity from 0.15 */
   --sys-color-on-primary-container: #d1eaff;
   
   --sys-color-secondary: #7dd3fc;
   --sys-color-on-secondary: #082f49;
-  --sys-color-secondary-container: rgba(125, 211, 252, 0.1);
+  --sys-color-secondary-container: rgba(125, 211, 252, 0.05); /* Reduced opacity from 0.1 */
   --sys-color-on-secondary-container: #bae6fd;
 
   --sys-color-error: #f2b8b5;
@@ -44,8 +44,8 @@ body {
   margin: 0;
   background-color: var(--sys-color-background);
   background-image: 
-    radial-gradient(circle at 15% 50%, var(--sys-color-primary-container), transparent 25%),
-    radial-gradient(circle at 85% 30%, var(--sys-color-secondary-container), transparent 25%);
+    radial-gradient(circle at 15% 50%, var(--sys-color-primary-container), transparent 50%),
+    radial-gradient(circle at 85% 30%, var(--sys-color-secondary-container), transparent 50%);
   background-attachment: fixed;
   color: var(--sys-color-on-background);
   font-family: var(--font-family);
