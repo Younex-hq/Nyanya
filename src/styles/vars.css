@@ -7,10 +7,10 @@
   --sys-color-surface-variant: rgba(255, 255, 255, 0.03);
   --sys-color-on-surface: #f1f5f9;
   
-  --sys-color-primary: #d0bcff; /* M3-like light purple */
-  --sys-color-on-primary: #381e72;
-  --sys-color-primary-container: rgba(139, 92, 246, 0.15);
-  --sys-color-on-primary-container: #eaddff;
+  --sys-color-primary: rgb(189, 226, 255); /* New Sky Blue Default */
+  --sys-color-on-primary: #003354;
+  --sys-color-primary-container: rgba(189, 226, 255, 0.15);
+  --sys-color-on-primary-container: #d1eaff;
   
   --sys-color-secondary: #7dd3fc;
   --sys-color-on-secondary: #082f49;
