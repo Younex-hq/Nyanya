@@ -20,12 +20,22 @@ export class TimerService extends EventTarget {
     
     private intervalId: number | null = null;
     private pauseIntervalId: number | null = null;
+    private lastTickAt = 0;
+    private lastPauseTickAt = 0;
     
     // Track how many continuous sessions without long break
     private sessionCount = 0;
 
     constructor() {
         super();
+        document.addEventListener('visibilitychange', () => {
+            if (this.intervalId && (this.state === 'Focus' || this.state === 'Break' || this.state === 'IdleAfterFocus')) {
+                this.startTicker();
+            }
+            if (this.pauseIntervalId && this.state === 'FocusPaused') {
+                this.startPausingTicker();
+            }
+        });
     }
 
     setTag(tag: Tag) {
@@ -220,9 +230,10 @@ export class TimerService extends EventTarget {
 
     private startTicker() {
         if (this.intervalId) clearInterval(this.intervalId);
+        this.lastTickAt = Date.now();
         this.intervalId = window.setInterval(() => {
             this.tick();
-        }, 1000);
+        }, document.hidden ? 5000 : 1000);
     }
 
     private stopTicker() {
@@ -234,10 +245,14 @@ export class TimerService extends EventTarget {
 
     private startPausingTicker() {
         if (this.pauseIntervalId) clearInterval(this.pauseIntervalId);
+        this.lastPauseTickAt = Date.now();
         this.pauseIntervalId = window.setInterval(() => {
-            this.interruptionSeconds++;
+            const now = Date.now();
+            const elapsedSeconds = Math.max(1, Math.floor((now - this.lastPauseTickAt) / 1000));
+            this.lastPauseTickAt += elapsedSeconds * 1000;
+            this.interruptionSeconds += elapsedSeconds;
             this.notify();
-        }, 1000);
+        }, document.hidden ? 5000 : 1000);
     }
 
     private stopPausingTicker() {
@@ -248,14 +263,20 @@ export class TimerService extends EventTarget {
     }
 
     private tick() {
+        const now = Date.now();
+        const elapsedSeconds = Math.max(1, Math.floor((now - this.lastTickAt) / 1000));
+        this.lastTickAt += elapsedSeconds * 1000;
+
         if (this.state === 'Focus' || this.state === 'Break') {
-            if (this.timeRemainingSeconds > 0) {
-                this.timeRemainingSeconds--;
+            if (this.timeRemainingSeconds > elapsedSeconds) {
+                this.timeRemainingSeconds -= elapsedSeconds;
             } else {
+                this.timeRemainingSeconds = 0;
                 this.handlePhaseComplete();
+                return;
             }
         } else if (this.state === 'IdleAfterFocus') {
-            this.idleSeconds++;
+            this.idleSeconds += elapsedSeconds;
         }
         this.notify();
     }

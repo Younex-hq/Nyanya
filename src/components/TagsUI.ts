@@ -7,6 +7,8 @@ export class TagsUI {
     private timerService: TimerService;
     private tags: Tag[] = [];
     private isManagementMode: boolean = false;
+    private lastTimerState = '';
+    private lastActiveTagId: number | undefined = undefined;
 
     constructor(container: HTMLElement, timerService: TimerService) {
         this.container = container;
@@ -314,7 +316,6 @@ export class TagsUI {
         // Re-attach the add button event since we re-created the element
         addEl.addEventListener("click", () => {
             const form = document.getElementById("tag-form") as HTMLFormElement;
-            const modal = document.getElementById("tag-modal")!;
             form.reset();
             const nameInput = document.getElementById("tag-name") as HTMLInputElement;
             nameInput.disabled = false;
@@ -459,20 +460,18 @@ export class TagsUI {
         });
 
         this.timerService.addEventListener("change", () => {
-            // Only re-render if the tags modal is actually visible to prevent flickering
+            const state = this.timerService.getState();
+            const activeTagId = this.timerService.activeTag?.id;
+            const stateChanged = state !== this.lastTimerState;
+            const activeTagChanged = activeTagId !== this.lastActiveTagId;
+            this.lastTimerState = state;
+            this.lastActiveTagId = activeTagId;
+            if (!stateChanged && !activeTagChanged) return;
             const modal = document.getElementById("tags-wrapper-modal");
-            // Check if modal is truly visible (not hidden and has opacity > 0 or display != none)
-            const isVisible = modal && !modal.classList.contains("hidden") && window.getComputedStyle(modal).display !== 'none';
+            const hash = location.hash.replace('#', '');
+            const isVisible = hash === 'tags' && modal && !modal.classList.contains("hidden");
             if (isVisible) {
-                // Instead of a full re-render, we could selectively update, but since the only thing that changes frequently is the count...
-                // Actually, the timer ticks every second, so "change" fires every second.
-                // We only need to re-render the list when a session *completes*, not every tick.
-                // However, since we don't have a specific "session complete" event, let's just avoid re-rendering while the timer is actively ticking, 
-                // because session counts only update when a session ends.
-                const state = this.timerService.getState();
-                if (state !== 'Focus' && state !== 'Break' && state !== 'FocusPaused' && state !== 'BreakPaused') {
-                    this.renderList();
-                }
+                this.renderList();
             }
         });
     }

@@ -12,6 +12,9 @@ export class StatisticsUI {
     private timelineDate: Date = new Date();
     private yearlyHeatmapDate: Date = new Date();
     private selectedTag: string | null = null;
+    private currentThemeColor: string | null = null;
+    private cachedSessions: Session[] | null = null;
+    private cachedTags: Tag[] | null = null;
 
     constructor(container: HTMLElement, tagsUI: TagsUI) {
         this.container = container;
@@ -237,15 +240,22 @@ export class StatisticsUI {
     }
 
     private updateDynamicTheme(color: string) {
+        if (this.currentThemeColor === color) {
+            return;
+        }
         const root = document.documentElement;
         root.style.setProperty('--sys-color-primary', color);
         root.style.setProperty('--sys-color-primary-container', `color-mix(in srgb, ${color}, transparent 92%)`);
         root.style.setProperty('--sys-color-secondary-container', `color-mix(in srgb, ${color}, transparent 95%)`);
+        this.currentThemeColor = color;
     }
 
     public async render() {
-        let sessions = await StorageService.getSessions();
-        const tags = await StorageService.getTags();
+        this.cachedSessions = await StorageService.getSessions();
+        this.cachedTags = await StorageService.getTags();
+
+        let sessions = this.cachedSessions;
+        const tags = this.cachedTags;
         const tagMap = new Map(tags.map((t) => [t.name, t]));
 
         if (this.selectedTag) {
@@ -359,8 +369,10 @@ export class StatisticsUI {
     }
 
     private async renderTimelineOnly() {
-        let sessions = await StorageService.getSessions();
-        const tags = await StorageService.getTags();
+        let sessions = this.cachedSessions ?? await StorageService.getSessions();
+        const tags = this.cachedTags ?? await StorageService.getTags();
+        this.cachedSessions = sessions;
+        this.cachedTags = tags;
         const tagMap = new Map(tags.map((t) => [t.name, t]));
 
         if (this.selectedTag) {
@@ -404,40 +416,41 @@ export class StatisticsUI {
         const data = Object.values(groupedByTag);
         const bgColors = labels.map((l) => tagMap.get(l)?.color || "#999");
 
-        const ringCtx = document.getElementById(
-            "chart-ring",
-        ) as HTMLCanvasElement;
-        if (this.ringChartInstance) this.ringChartInstance.destroy();
-        this.ringChartInstance = new Chart(ringCtx, {
-            type: "doughnut",
-            data: {
-                labels,
-                datasets: [{ data, backgroundColor: bgColors, borderWidth: 0 }],
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        position: "bottom",
-                        labels: { color: "#e6e1e5" },
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const val = context.raw as number;
-                                return `${context.label}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(val)}`;
+        if (this.ringChartInstance) {
+            this.ringChartInstance.data.labels = labels;
+            this.ringChartInstance.data.datasets[0].data = data;
+            this.ringChartInstance.data.datasets[0].backgroundColor = bgColors;
+            this.ringChartInstance.update("none");
+        } else {
+            const ringCtx = document.getElementById(
+                "chart-ring",
+            ) as HTMLCanvasElement;
+            this.ringChartInstance = new Chart(ringCtx, {
+                type: "doughnut",
+                data: {
+                    labels,
+                    datasets: [{ data, backgroundColor: bgColors, borderWidth: 0 }],
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: { color: "#e6e1e5" },
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const val = context.raw as number;
+                                    return `${context.label}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(val)}`;
+                                },
                             },
                         },
                     },
                 },
-            },
-        });
+            });
+        }
 
         // Bar Graph
-        const lineCtx = document.getElementById(
-            "chart-line",
-        ) as HTMLCanvasElement;
-        if (this.lineChartInstance) this.lineChartInstance.destroy();
-
         // Generate full list of days for the range
         let daysRaw: string[] = [];
         const now = new Date();
@@ -493,51 +506,62 @@ export class StatisticsUI {
             focusBarColor = tagMap.get(this.selectedTag)?.color || defaultColor;
         }
 
-        this.lineChartInstance = new Chart(lineCtx, {
-            type: "bar",
-            data: {
-                labels: daysRaw,
-                datasets: [
-                    {
-                        label: "Focus",
-                        data: focusData,
-                        backgroundColor: focusBarColor,
+        if (this.lineChartInstance) {
+            this.lineChartInstance.data.labels = daysRaw;
+            this.lineChartInstance.data.datasets[0].data = focusData;
+            this.lineChartInstance.data.datasets[0].backgroundColor = focusBarColor;
+            this.lineChartInstance.data.datasets[1].data = intData;
+            this.lineChartInstance.update("none");
+        } else {
+            const lineCtx = document.getElementById(
+                "chart-line",
+            ) as HTMLCanvasElement;
+            this.lineChartInstance = new Chart(lineCtx, {
+                type: "bar",
+                data: {
+                    labels: daysRaw,
+                    datasets: [
+                        {
+                            label: "Focus",
+                            data: focusData,
+                            backgroundColor: focusBarColor,
+                        },
+                        {
+                            label: "Interruptions",
+                            data: intData,
+                            backgroundColor: "#f2b8b5",
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: "#e6e1e5" } },
+                        y: {
+                            ticks: {
+                                color: "#e6e1e5",
+                                stepSize: 30,
+                                callback: (value: any) => {
+                                    return `${(value / 60).toFixed(1)} h`;
+                                },
+                            },
+                        },
                     },
-                    {
-                        label: "Interruptions",
-                        data: intData,
-                        backgroundColor: "#f2b8b5",
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { ticks: { color: "#e6e1e5" } },
-                    y: {
-                        ticks: {
-                            color: "#e6e1e5",
-                            stepSize: 30,
-                            callback: (value: any) => {
-                                return `${(value / 60).toFixed(1)} h`;
+                    plugins: {
+                        legend: { labels: { color: "#e6e1e5" } },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const val = context.raw as number;
+                                    return `${context.dataset.label}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(val)}`;
+                                },
                             },
                         },
                     },
                 },
-                plugins: {
-                    legend: { labels: { color: "#e6e1e5" } },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const val = context.raw as number;
-                                return `${context.dataset.label}: ${StatisticsHelpers.formatDecimalMinutesToHHMMSS(val)}`;
-                            },
-                        },
-                    },
-                },
-            },
-        });
+            });
+        }
     }
 
     private renderProductiveHours(
@@ -577,7 +601,8 @@ export class StatisticsUI {
     }
 
     private async renderYearlyOnly() {
-        let sessions = await StorageService.getSessions();
+        let sessions = this.cachedSessions ?? await StorageService.getSessions();
+        this.cachedSessions = sessions;
         if (this.selectedTag) {
             sessions = sessions.filter(s => s.label === this.selectedTag);
         }
@@ -615,7 +640,6 @@ export class StatisticsUI {
         const heatmapStart = new Date(startOfYear);
         heatmapStart.setDate(startOfYear.getDate() - startDay);
 
-        const daysInYear = 366; // Always show ~53 weeks
         const daysToShow = 53 * 7;
 
         // Intensity mapping

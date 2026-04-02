@@ -7,6 +7,9 @@ export class TimerUI {
     private tagsUI: TagsUI;
     private lastCountTagId: number | undefined = -1;
     private lastCountValue: number = 0;
+    private previousState = '';
+    private lastTagBadgeKey = '';
+    private currentThemeColor: string | null = null;
 
     constructor(container: HTMLElement, timerService: TimerService, tagsUI: TagsUI) {
         this.container = container;
@@ -146,6 +149,21 @@ export class TimerUI {
         return `${mStr}:${sStr}`;
     }
 
+    private setTagBadge(name: string, count: number) {
+        const tagBadge = document.getElementById('active-tag-badge')!;
+        const key = `${name}|${count}`;
+        if (this.lastTagBadgeKey === key) return;
+        tagBadge.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+            <span class="tag-badge-name">${name}</span>
+            <span class="tag-session-count">${count}</span>
+        `;
+        this.lastTagBadgeKey = key;
+    }
+
     public render() {
         const tagBadge = document.getElementById('active-tag-badge')!;
         const timeDisplay = document.getElementById('time-display')!;
@@ -167,34 +185,30 @@ export class TimerUI {
         
         // Update Tag and fetch session count occasionally
         if (tag) {
-            this.updateDynamicTheme(tag.color);
+            // Only update theme if Statistics modal is NOT open to prevent color flickering/override
+            if (location.hash !== '#stats') {
+                this.updateDynamicTheme(tag.color);
+            }
+            
             tagBadge.style.setProperty('--tag-color', tag.color);
             tagBadge.style.backgroundColor = 'transparent'; // Let CSS handle the glass look
-            if (this.lastCountTagId !== tag.id || state === 'IdleAfterFocus') {
+            if (this.lastCountTagId !== tag.id || (state === 'IdleAfterFocus' && this.previousState !== 'IdleAfterFocus')) {
                 this.timerService.getTodaySessionCountForTag().then(c => {
+                    if (!this.timerService.activeTag || this.timerService.activeTag.id !== tag.id) {
+                        return;
+                    }
                     this.lastCountValue = c;
                     this.lastCountTagId = tag.id;
-                    tagBadge.innerHTML = `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                        </svg>
-                        <span class="tag-badge-name">${tag.name}</span>
-                        <span class="tag-session-count">${c}</span>
-                    `;
+                    this.setTagBadge(tag.name, c);
                 });
             } else {
-                tagBadge.innerHTML = `
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                    </svg>
-                    <span class="tag-badge-name">${tag.name}</span>
-                    <span class="tag-session-count">${this.lastCountValue}</span>
-                `;
+                this.setTagBadge(tag.name, this.lastCountValue);
             }
         } else {
-            this.updateDynamicTheme('#d0bcff'); // Default purple
+            if (location.hash !== '#stats') {
+                this.updateDynamicTheme('#d0bcff'); // Default purple
+            }
+            this.lastTagBadgeKey = '';
         }
 
         // Update Dial
@@ -253,12 +267,17 @@ export class TimerUI {
         } else {
             intDisplay.classList.add('hidden');
         }
+        this.previousState = state;
     }
 
     private updateDynamicTheme(color: string) {
+        if (this.currentThemeColor === color) {
+            return;
+        }
         const root = document.documentElement;
         root.style.setProperty('--sys-color-primary', color);
         root.style.setProperty('--sys-color-primary-container', `color-mix(in srgb, ${color}, transparent 92%)`);
         root.style.setProperty('--sys-color-secondary-container', `color-mix(in srgb, ${color}, transparent 95%)`);
+        this.currentThemeColor = color;
     }
 }
