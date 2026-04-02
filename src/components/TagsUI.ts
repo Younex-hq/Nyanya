@@ -17,18 +17,20 @@ export class TagsUI {
     private initialize() {
         // 1. Tag Selector List (In the wrapper)
         this.container.innerHTML = `
-            <div class="tags-manager-view">
-                <div class="tags-header" style="text-align: center; margin-bottom: 2.5rem;">
-                    <h2 id="tag-modal-title" style="font-size: 2rem; margin-bottom: 0.5rem;">Select a Tag</h2>
-                    <p style="opacity: 0.7; font-size: 1rem;">What are we working on today?</p>
+            <div class="tags-manager-view" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div class="tags-header" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem;">
+                    <div style="background: var(--sys-color-primary-container, rgba(208, 188, 255, 0.15)); padding: 1rem; border-radius: 50%; margin-bottom: 1rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--sys-color-primary, #d0bcff)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
+                    </div>
+                    <h2 id="tag-selector-title" style="font-size: 2.2rem; font-weight: 700; margin: 0 0 0.5rem 0; letter-spacing: -0.5px;">Select a Tag</h2>
+                    <p style="opacity: 0.6; font-size: 1.05rem; margin: 0; max-width: 400px; text-align: center;">Choose a tag to track your progress and categorize your session.</p>
                 </div>
 
-                <div id="tags-list" class="tags-grid">
+                <div id="tags-list" class="tags-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; padding: 0.5rem;">
                     <!-- Tags will be rendered here -->
-                </div>
-
-                <div style="display: flex; justify-content: center; margin-top: 3rem;">
-                    <button class="btn-primary" id="btn-add-tag" style="padding: 1rem 2.5rem;">+ Add New Tag</button>
                 </div>
             </div>
         `;
@@ -52,8 +54,8 @@ export class TagsUI {
                     </div>
 
                     <!-- Body with Fields -->
-                    <div class="tag-forge-body" style="padding: 2rem;">
-                        <h2 id="tag-modal-title" style="margin-bottom: 2rem; text-align: center; font-size: 1.5rem; letter-spacing: 1px;">TAG FORGE</h2>
+                    <div class="tag-forge-body" style="padding: 2.5rem;">
+                        <h2 id="tag-forge-title" style="margin: 0 0 2rem 0; text-align: center; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px; color: var(--sys-color-primary, #d0bcff);">Tag Forge</h2>
 
                         <form id="tag-form" style="display:flex; flex-direction:column; gap: 1.5rem;">
                             <input type="hidden" id="tag-id" />
@@ -126,35 +128,58 @@ export class TagsUI {
 
         this.tags.forEach((tag) => {
             const el = document.createElement("div");
-            el.className = "tag-badge interactive-tag";
-            el.style.backgroundColor = tag.color;
+            el.className = "tag-card interactive-tag";
             el.style.cursor = "pointer";
+            el.style.backgroundColor = "var(--sys-color-surface)";
+            el.style.border = `1px solid ${tag.color}40`;
+            el.style.borderRadius = "16px";
+            el.style.padding = "1.25rem";
+            el.style.display = "flex";
+            el.style.flexDirection = "column";
+            el.style.gap = "0.5rem";
+            el.style.position = "relative";
+            el.style.transition = "all 0.2s ease";
+            el.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+
+            // Hover effect handled by CSS via class .tag-card:hover
 
             // Determine active outline (only in selection mode)
             if (
                 !this.isManagementMode &&
                 this.timerService.activeTag?.id === tag.id
             ) {
-                el.style.border = "2px solid white";
-                el.style.boxShadow = `0 0 20px ${tag.color}80, 0 4px 12px rgba(0,0,0,0.3)`;
+                el.style.border = `2px solid ${tag.color}`;
+                el.style.backgroundColor = `${tag.color}15`;
+                el.style.boxShadow = `0 0 20px ${tag.color}40, 0 4px 12px rgba(0,0,0,0.3)`;
             }
 
             const count = counts[tag.name] || 0;
             el.innerHTML = `
-                <span class="tag-badge-name">${tag.name}</span>
-                <span class="tag-session-count">${count}</span>
-                ${
-                    this.isManagementMode
-                        ? `
-                <button class="btn-edit-tag" title="edit Tag" style="margin-left: 0.5rem;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                </button>
-                `
-                        : ""
-                }
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                    <div style="width: 16px; height: 16px; border-radius: 50%; background-color: ${tag.color}; box-shadow: 0 0 10px ${tag.color};"></div>
+                    ${
+                        this.isManagementMode
+                            ? `
+                    <button class="btn-edit-tag" title="Edit Tag" style="background: transparent; border: none; color: var(--sys-color-on-surface); opacity: 0.5; padding: 0; cursor: pointer; transition: opacity 0.2s;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    `
+                            : ""
+                    }
+                </div>
+                <div style="margin-top: 0.5rem;">
+                    <div style="font-size: 1.1rem; font-weight: 600; color: var(--sys-color-on-surface); margin-bottom: 0.25rem;">${tag.name}</div>
+                    <div style="font-size: 0.85rem; opacity: 0.6; display: flex; align-items: center; gap: 0.25rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                        </svg>
+                        ${count} session${count !== 1 ? 's' : ''} today
+                    </div>
+                </div>
             `;
 
             el.addEventListener("click", (e) => {
@@ -184,28 +209,54 @@ export class TagsUI {
             list.appendChild(el);
         });
 
-        // Re-render when timer service changes if we want to ensure sync,
-        // but simple click sync is fine here.
-    }
+        // Add "New Tag" button as a card in the grid
+        const addEl = document.createElement("div");
+        addEl.className = "tag-card add-tag-card interactive-tag";
+        addEl.id = "btn-add-tag";
+        addEl.style.cursor = "pointer";
+        addEl.style.border = "2px dashed rgba(255, 255, 255, 0.2)";
+        addEl.style.borderRadius = "16px";
+        addEl.style.backgroundColor = "transparent";
+        addEl.style.color = "var(--sys-color-primary, #d0bcff)";
+        addEl.style.display = "flex";
+        addEl.style.flexDirection = "column";
+        addEl.style.justifyContent = "center";
+        addEl.style.alignItems = "center";
+        addEl.style.minHeight = "120px";
+        addEl.style.gap = "0.5rem";
+        addEl.style.transition = "all 0.2s ease";
 
-    private attachEvents() {
-        const btnAdd = document.getElementById("btn-add-tag")!;
-        const modal = document.getElementById("tag-modal")!;
-        const btnClose = document.getElementById("btn-close-tag")!;
-        const form = document.getElementById("tag-form") as HTMLFormElement;
+        addEl.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span style="font-weight: 600; font-size: 0.9rem;">Add New Tag</span>
+        `;
+        
+        list.appendChild(addEl);
 
-        btnAdd.addEventListener("click", () => {
+        // Re-attach the add button event since we re-created the element
+        addEl.addEventListener("click", () => {
+            const form = document.getElementById("tag-form") as HTMLFormElement;
+            const modal = document.getElementById("tag-modal")!;
             document
                 .getElementById("tags-wrapper-modal")
                 ?.classList.add("hidden");
             form.reset();
             (document.getElementById("tag-id") as HTMLInputElement).value = "";
-            document.getElementById("tag-modal-title")!.textContent =
+            document.getElementById("tag-forge-title")!.textContent =
                 "Create Tag";
             document.getElementById("btn-delete-tag")!.classList.add("hidden");
             this.updatePreview();
             modal.classList.remove("hidden");
         });
+    }
+
+    private attachEvents() {
+        const modal = document.getElementById("tag-modal")!;
+        const btnClose = document.getElementById("btn-close-tag")!;
+        const form = document.getElementById("tag-form") as HTMLFormElement;
 
         // Live Preview Listeners
         const nameInput = document.getElementById(
@@ -317,8 +368,8 @@ export class TagsUI {
         const btnDelete = document.getElementById("btn-delete-tag")!;
 
         form.reset();
-        document.getElementById("tag-modal-title")!.textContent =
-            "Select a Tag";
+        document.getElementById("tag-forge-title")!.textContent =
+            "Edit Tag";
         (document.getElementById("tag-id") as HTMLInputElement).value =
             tag.id!.toString();
         (document.getElementById("tag-name") as HTMLInputElement).value =

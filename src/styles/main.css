@@ -226,6 +226,19 @@ main {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
 }
 
+.tag-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    border-color: var(--sys-color-primary);
+}
+
+.add-tag-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--sys-color-primary) !important;
+    background-color: var(--sys-color-primary-container) !important;
+}
+
 .btn-edit-tag {
     background: rgba(0, 0, 0, 0.2);
     border: none;
