@@ -66,21 +66,33 @@ export class StorageService {
 
     static async exportData(tagsToExport?: string[]): Promise<void> {
         let sessions = await this.getSessions();
+        let tags = await this.getTags();
+
         if (tagsToExport && tagsToExport.length > 0) {
             sessions = sessions.filter(s => tagsToExport.includes(s.label));
+            tags = tags.filter(t => tagsToExport.includes(t.name));
         }
 
-        const data = JSON.stringify(sessions.map(s => {
-            const copy = { ...s };
-            delete copy.id;
-            return copy;
-        }), null, 2);
+        const exportObj = {
+            sessions: sessions.map(s => {
+                const copy = { ...s };
+                delete copy.id;
+                return copy;
+            }),
+            tags: tags.map(t => {
+                const copy = { ...t };
+                delete copy.id;
+                return copy;
+            })
+        };
+
+        const data = JSON.stringify(exportObj, null, 2);
 
         const blob = new Blob([data], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `pomodoro_export_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `pomodoro_full_export_${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -90,10 +102,29 @@ export class StorageService {
     static async importData(jsonData: string): Promise<void> {
         try {
             const data = JSON.parse(jsonData);
+            
+            // Handle Old Format (Array of sessions)
             if (Array.isArray(data)) {
-                // Ensure some basic validation
                 const validSessions = data.filter(s => s.end && s.label && typeof s.duration === 'number');
                 await db.sessions.bulkAdd(validSessions);
+                return;
+            }
+
+            // Handle New Format (Object with sessions and tags)
+            if (data.sessions || data.tags) {
+                if (data.tags && Array.isArray(data.tags)) {
+                    // We clear and replace tags to avoid duplicates/conflicts
+                    await db.tags.clear();
+                    await db.tags.bulkAdd(data.tags);
+                }
+
+                if (data.sessions && Array.isArray(data.sessions)) {
+                    // For sessions, we might want to just add them to existing ones
+                    // or clear them. User said "continue where it stopped", 
+                    // which usually implies a full restore.
+                    await db.sessions.clear();
+                    await db.sessions.bulkAdd(data.sessions);
+                }
             }
         } catch (e) {
             console.error('Failed to import data:', e);
