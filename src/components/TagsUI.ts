@@ -369,7 +369,23 @@ export class TagsUI {
             }
         });
 
-        this.timerService.addEventListener("change", () => this.renderList());
+        this.timerService.addEventListener("change", () => {
+            // Only re-render if the tags modal is actually visible to prevent flickering
+            const modal = document.getElementById("tags-wrapper-modal");
+            // Check if modal is truly visible (not hidden and has opacity > 0 or display != none)
+            const isVisible = modal && !modal.classList.contains("hidden") && window.getComputedStyle(modal).display !== 'none';
+            if (isVisible) {
+                // Instead of a full re-render, we could selectively update, but since the only thing that changes frequently is the count...
+                // Actually, the timer ticks every second, so "change" fires every second.
+                // We only need to re-render the list when a session *completes*, not every tick.
+                // However, since we don't have a specific "session complete" event, let's just avoid re-rendering while the timer is actively ticking, 
+                // because session counts only update when a session ends.
+                const state = this.timerService.getState();
+                if (state !== 'Focus' && state !== 'Break' && state !== 'FocusPaused' && state !== 'BreakPaused') {
+                    this.renderList();
+                }
+            }
+        });
     }
 
     private openEditModal(tag: Tag) {
