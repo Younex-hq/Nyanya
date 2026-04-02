@@ -49,9 +49,9 @@ export class StatisticsUI {
                             <h3>Range Analysis</h3>
                             <select id="stat-range-select" class="input-field" style="width: auto; padding: 0.25rem; margin: 0; font-size: 0.8rem;">
                                 <option value="today">Today</option>
-                                <option value="week">Week</option>
+                                <option value="week" selected>Week</option>
                                 <option value="month">Month</option>
-                                <option value="total" selected>Total</option>
+                                <option value="total">Total</option>
                             </select>
                         </div>
                         <div class="stat-horizontal-row">
@@ -70,8 +70,10 @@ export class StatisticsUI {
                         </div>
                         <div class="stat-card">
                             <h3>Focus vs Interruptions</h3>
-                            <div style="width: 100%; height: 260px;">
-                                <canvas id="chart-line"></canvas>
+                            <div style="width: 100%; height: 260px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                                <div id="chart-line-container" style="height: 100%; min-width: 100%;">
+                                    <canvas id="chart-line"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -225,9 +227,7 @@ export class StatisticsUI {
                 StatisticsHelpers.getBreakTimeMin(todaySessions),
             );
         document.getElementById("stat-today-int")!.textContent =
-            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
-                StatisticsHelpers.getInterruptionsMin(todaySessions),
-            );
+            StatisticsHelpers.getInterruptionsMin(todaySessions).toString();
 
         const rangeStr = (
             document.getElementById("stat-range-select") as HTMLSelectElement
@@ -245,9 +245,7 @@ export class StatisticsUI {
                 StatisticsHelpers.getBreakTimeMin(rangeSessions),
             );
         document.getElementById("stat-range-int")!.textContent =
-            StatisticsHelpers.formatDecimalMinutesToHHMMSS(
-                StatisticsHelpers.getInterruptionsMin(rangeSessions),
-            );
+            StatisticsHelpers.getInterruptionsMin(rangeSessions).toString();
 
         this.renderGraphs(rangeSessions, tagMap);
         this.renderProductiveHours(sessions, tagMap);
@@ -407,6 +405,13 @@ export class StatisticsUI {
                 .filter((s) => s.end.startsWith(d))
                 .reduce((a, b) => a + b.interruptions, 0),
         );
+
+        // Dynamic width calculation
+        const container = document.getElementById("chart-line-container")!;
+        const minWidthPerDay = 60; // Adjust as needed
+        const totalDays = daysRaw.length;
+        const calculatedWidth = Math.max(100, totalDays * minWidthPerDay);
+        container.style.width = totalDays > 7 ? `${calculatedWidth}px` : "100%";
 
         this.lineChartInstance = new Chart(lineCtx, {
             type: "bar",
