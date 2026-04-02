@@ -132,7 +132,9 @@ export class StorageService {
         }
     }
 
-    static async clearSessions(): Promise<void> {
+    static async clearAllData(): Promise<void> {
         await db.sessions.clear();
+        await db.tags.clear();
+        await this.initDefaults();
     }
 }

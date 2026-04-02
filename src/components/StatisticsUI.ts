@@ -173,10 +173,10 @@ export class StatisticsUI {
             .addEventListener("click", async () => {
                 if (
                     window.confirm(
-                        "Are you sure you want to clear all session data? This cannot be undone.",
+                        "Are you sure you want to clear all data? This will reset the app to its factory state (including custom tags).",
                     )
                 ) {
-                    await StorageService.clearSessions();
+                    await StorageService.clearAllData();
                     this.render();
                 }
             });
