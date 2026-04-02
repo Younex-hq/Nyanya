@@ -106,20 +106,33 @@ export class StorageService {
             // Handle Old Format (Array of sessions)
             if (Array.isArray(data)) {
                 const validSessions = data.filter(s => s.end && s.label && typeof s.duration === 'number');
-                await db.sessions.bulkAdd(validSessions);
+                for (const s of validSessions) {
+                    const existing = await db.sessions.where('end').equals(s.end).first();
+                    if (existing) {
+                        await db.sessions.delete(existing.id!);
+                    }
+                    delete s.id; // ensure we don't try to use an old ID
+                    await db.sessions.add(s);
+                }
                 return;
             }
 
             // Handle New Format (Object with sessions and tags)
             if (data.sessions || data.tags) {
                 if (data.tags && Array.isArray(data.tags)) {
-                    // We clear and replace tags to avoid duplicates/conflicts
-                    await db.tags.clear();
-                    await db.tags.bulkAdd(data.tags);
+                    for (const t of data.tags) {
+                        const existing = await db.tags.where('name').equals(t.name).first();
+                        if (existing) {
+                            await db.tags.update(existing.id!, t);
+                        } else {
+                            delete t.id; // ensure we don't try to use an old ID
+                            await db.tags.add(t);
+                        }
+                    }
                     
                     // Ensure "Pomodoro" tag is always present
-                    const pomodoroExists = data.tags.some((t: any) => t.name === 'Pomodoro');
-                    if (!pomodoroExists) {
+                    const pomodoro = await db.tags.where('name').equals('Pomodoro').first();
+                    if (!pomodoro) {
                         await db.tags.add({
                             name: 'Pomodoro',
                             color: 'rgb(189, 226, 255)',
@@ -132,11 +145,14 @@ export class StorageService {
                 }
 
                 if (data.sessions && Array.isArray(data.sessions)) {
-                    // For sessions, we might want to just add them to existing ones
-                    // or clear them. User said "continue where it stopped", 
-                    // which usually implies a full restore.
-                    await db.sessions.clear();
-                    await db.sessions.bulkAdd(data.sessions);
+                    for (const s of data.sessions) {
+                        const existing = await db.sessions.where('end').equals(s.end).first();
+                        if (existing) {
+                            await db.sessions.delete(existing.id!);
+                        }
+                        delete s.id; // ensure we don't try to use an old ID
+                        await db.sessions.add(s);
+                    }
                 }
             }
         } catch (e) {
