@@ -35,7 +35,7 @@ export class StatisticsUI {
 
                     <div class="stat-card heatmap-container">
                         <h3>Productive Hours (Today)</h3>
-                        <div id="heatmap-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
+                        <div id="heatmap-container-inner" class="heatmap-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
                             <div class="heatmap-grid daily-heatmap" id="heatmap-hours"></div>
                             <div class="heatmap-labels daily-labels" id="heatmap-labels"></div>
                         </div>
@@ -99,7 +99,7 @@ export class StatisticsUI {
                                 <strong id="stat-timeline-focus" style="color: var(--sys-color-primary); font-weight: 700;">00:00</strong>
                             </div>
                         </div>
-                        <div id="heatmap-timeline-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
+                        <div id="heatmap-timeline-container-inner" class="heatmap-container-inner" style="display: flex; flex-direction: column; gap: 0.25rem;">
                             <div class="heatmap-grid daily-heatmap" id="heatmap-timeline-hours"></div>
                             <div class="heatmap-labels daily-labels" id="heatmap-timeline-labels" style="font-size: 0.65rem;"></div>
                         </div>
