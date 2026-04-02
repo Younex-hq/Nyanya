@@ -21,8 +21,7 @@ export class StorageService {
         const count = await db.tags.count();
         if (count === 0) {
             await db.tags.bulkAdd([
-                { name: 'Study', color: '#4CAF50', focusTime: 25, breakTime: 5, longBreakTime: 15, sessionsBeforeLongBreak: 4 },
-                { name: 'onLaptop', color: '#2196F3', focusTime: 30, breakTime: 5, longBreakTime: 20, sessionsBeforeLongBreak: 3 },
+                { name: 'Pomodoro', color: 'rgb(189, 226, 255)', focusTime: 25, breakTime: 5, longBreakTime: 15, sessionsBeforeLongBreak: 4 },
             ]);
         }
     }
