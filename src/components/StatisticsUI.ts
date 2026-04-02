@@ -464,7 +464,8 @@ export class StatisticsUI {
         gridEl.innerHTML = "";
         labelsEl.innerHTML = "";
 
-        const hours = StatisticsHelpers.getProductiveHoursVector(sessions);
+        const todaySessions = StatisticsHelpers.getTodaySessions(sessions);
+        const hours = StatisticsHelpers.getProductiveHoursVector(todaySessions);
         const maxDur = Math.max(...hours.map((h) => h.duration), 1);
 
         hours.forEach((h) => {

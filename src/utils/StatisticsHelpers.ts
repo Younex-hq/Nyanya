@@ -45,10 +45,9 @@ export class StatisticsHelpers {
     }
 
     static getProductiveHoursVector(sessions: Session[], numHours = 24): {hour: number, duration: number, label: string}[] {
-        // Just today for productive hours
-        const todaySessions = this.getTodaySessions(sessions).filter(s => !s.is_break);
+        const focusSessions = sessions.filter(s => !s.is_break);
         const map: { [hour: number]: { duration: number, label: string } } = {};
-        for (const s of todaySessions) {
+        for (const s of focusSessions) {
             const hour = new Date(s.end).getHours();
             if(!map[hour]) map[hour] = { duration: 0, label: s.label };
             map[hour].duration += s.duration;
