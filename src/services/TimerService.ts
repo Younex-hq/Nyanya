@@ -297,7 +297,7 @@ export class TimerService extends EventTarget {
         });
 
         // Browser notification
-        if (Notification.permission === 'granted') {
+        if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(wasFocus ? 'Focus session completed!' : 'Break ended. Time to focus!', {
                 body: wasFocus ? 'Great job! Take a well-deserved break.' : 'Back to work!',
                 icon: '/apple-touch-icon.png' // Ensure icon exists or fallback
@@ -316,6 +316,8 @@ export class TimerService extends EventTarget {
                 this.timeRemainingSeconds = this.activeTag.focusTime * 60;
             }
         }
+        
+        this.notify();
     }
 
     private notify() {
