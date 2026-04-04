@@ -214,8 +214,8 @@ export class TimerService extends EventTarget {
             this.timeRemainingSeconds = this.activeTag ? this.activeTag.focusTime * 60 : 25 * 60;
             this.interruptionSeconds = 0;
             this.idleSeconds = 0;
-            this.notify();
         }
+        this.notify(); // Always notify to sync UI if stuck
     }
 
     cancelSession() {
@@ -281,28 +281,57 @@ export class TimerService extends EventTarget {
         this.notify();
     }
 
+    private async sendPhaseNotification(wasFocus: boolean) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') {
+            return;
+        }
+
+        const title = wasFocus ? 'Focus session completed!' : 'Break ended. Time to focus!';
+        const body = wasFocus ? 'Great job! Take a well-deserved break.' : 'Back to work!';
+        const options: NotificationOptions = {
+            body,
+            icon: '/apple-touch-icon.png'
+        };
+
+        try {
+            new Notification(title, options);
+            return;
+        } catch (e) {
+            console.error('Window notification failed:', e);
+        }
+
+        if (!('serviceWorker' in navigator)) {
+            return;
+        }
+
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.showNotification(title, options);
+        } catch (e) {
+            console.error('Service worker notification failed:', e);
+        }
+    }
+
     private handlePhaseComplete() {
         this.stopTicker();
         const wasFocus = this.state === 'Focus';
         
-        // Save session automatically
-        StorageService.saveSession({
-            end: new Date().toISOString(),
-            duration: this.targetDurationMinutes,
-            interruptions: this.interruptionSeconds / 60, // save as minutes
-            label: this.activeTag?.name || 'Default',
-            notes: this.currentSessionNotes,
-            is_break: !wasFocus,
-            archived: false
-        });
-
-        // Browser notification
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification(wasFocus ? 'Focus session completed!' : 'Break ended. Time to focus!', {
-                body: wasFocus ? 'Great job! Take a well-deserved break.' : 'Back to work!',
-                icon: '/apple-touch-icon.png' // Ensure icon exists or fallback
+        try {
+            // Save session automatically
+            StorageService.saveSession({
+                end: new Date().toISOString(),
+                duration: this.targetDurationMinutes,
+                interruptions: this.interruptionSeconds / 60, // save as minutes
+                label: this.activeTag?.name || 'Default',
+                notes: this.currentSessionNotes,
+                is_break: !wasFocus,
+                archived: false
             });
+        } catch (e) {
+            console.error('Failed to save session:', e);
         }
+
+        void this.sendPhaseNotification(wasFocus);
 
         this.currentSessionNotes = '';
 
